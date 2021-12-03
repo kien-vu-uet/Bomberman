@@ -24,18 +24,17 @@ public class BombermanSimpleGraphics extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Game game = new Game();
-        game.initialize("src/main/resources/com/uet/oop/maps/map1.txt");
+        game.initialize("src/main/resources/com/uet/oop/maps/map2.txt");
         Pane root = new Pane();
-        root.setPrefSize(600, 400);
+        root.setPrefSize(500, 500);
         Label label = new Label();
         label.setFont(new Font(18));
         label.setText(game.getBoard().toString());
         root.getChildren().add(label);
-        List<AutomaticBot> autobots = new ArrayList<>();
-        for (Piece piece : game.getBoard().getBots()) {
-            autobots.add(new AutomaticBot(game, (Bot) piece));
-        }
-        Scene scene = new Scene(root, 600, 400);
+        Bot bot = new Bot(1, 1);
+        AutomaticBot autobot = new AutomaticBot(game, bot);
+        game.getBoard().add(bot);
+        Scene scene = new Scene(root, 500, 500);
 //        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 //            @Override
 //            public void handle(KeyEvent event) {
@@ -58,10 +57,8 @@ public class BombermanSimpleGraphics extends Application {
 //        });
         stage.setTitle("Hello!");
         stage.setScene(scene);
-        for (AutomaticBot bot : autobots) {
-            bot.start();
-        }
         stage.show();
+        autobot.start();
     }
 
     public static void main(String[] args) {
