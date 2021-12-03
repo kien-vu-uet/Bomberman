@@ -68,22 +68,37 @@ public class Board {
 
     public void print() {
         for (int i = 0; i < 30; i++) System.out.println();
-        System.out.print("   ");
+        System.out.println(this);
+    }
+
+    public String toString() {
+        String res = "   ";
         for (int i = 0; i < size; i++) {
-            System.out.printf("%-3s", i);
+            res +=  String.format("%-3s", i);
         }
-        System.out.println();
+        res += "\n";
         String[][] board = new String[size][size];
         for (Piece piece : pieces) {
             board[piece.getCoordinatesX()][piece.getCoordinatesY()] = piece.getSymbol();
         }
         for (int i = 0; i < size; i++) {
-            System.out.printf("%-3s", i);
+            res += String.format("%-3s", i);
             for (int j = 0; j < size; j++) {
-                if (board[i][j] == null) System.out.printf("%-3s", "   ");
-                else System.out.printf("%-3s", board[i][j]);
+                if (board[i][j] == null) res += String.format("%-3s", "   ");
+                else res += String.format("%-3s", board[i][j]);
             }
-            System.out.println();
+            res += "\n";
         }
+        return res;
+    }
+
+    public List<Piece> getBots() {
+        List<Piece> bots = new ArrayList<>();
+        for (Piece piece : pieces) {
+            if (piece instanceof Bot) {
+                bots.add(piece);
+            }
+        }
+        return bots;
     }
 }

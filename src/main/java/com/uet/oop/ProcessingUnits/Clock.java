@@ -4,7 +4,7 @@ import com.uet.oop.Entities.Bomb;
 import com.uet.oop.Entities.Game;
 
 public class Clock implements Runnable {
-    private static Thread thread;
+    private Thread thread;
     private boolean timeUp;
     private int interval;
     private Game game;
@@ -52,16 +52,15 @@ public class Clock implements Runnable {
 
     @Override
     public void run() {
-        while (!timeUp) {
-            try {
-                Thread.sleep(interval * 1000L);
-            } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
-            }
-            game.exploreAt(bomb.getCoordinatesX(), bomb.getCoordinatesY());
-            interval = 0;
-            timeUp = true;
+        if (!timeUp) return;
+        try {
+            Thread.sleep(interval * 1000L);
+        } catch (InterruptedException e) {
+            System.err.println(e.getMessage());
         }
+        game.exploreAt(bomb.getCoordinatesX(), bomb.getCoordinatesY());
+        interval = 0;
+        timeUp = true;
     }
 
     public void start() {
