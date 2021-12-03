@@ -21,6 +21,7 @@ public class AutomaticBot implements Runnable {
     @Override
     public void run() {
         while (isRunning) {
+            System.out.println("on acting");
             Random random = new Random();
             int direction = random.nextInt(4) % 4;
             game.movePiece(bot, direction);
