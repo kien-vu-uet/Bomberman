@@ -1,5 +1,6 @@
 package com.uet.oop.ProcessingUnits;
 
+import com.uet.oop.BombermanCommandLine;
 import com.uet.oop.Entities.Bot;
 import com.uet.oop.Entities.Game;
 
@@ -21,10 +22,12 @@ public class AutomaticBot implements Runnable {
     @Override
     public void run() {
         while (isRunning) {
-            System.out.println("on acting");
             Random random = new Random();
-            int direction = random.nextInt(4) % 4;
+            int direction; //= random.nextInt(4) % 2;
+            if (random.nextInt(2) == 1) direction = 0;
+            else direction = 2;
             game.movePiece(bot, direction);
+            game.getBoard().print();
             try {
                 int interval = random.nextInt(3000 / bot.getLevel());
                 Thread.sleep(interval);

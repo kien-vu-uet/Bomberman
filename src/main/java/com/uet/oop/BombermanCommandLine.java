@@ -1,43 +1,43 @@
 package com.uet.oop;
 
+import com.uet.oop.Entities.Bot;
 import com.uet.oop.Entities.Game;
 import com.uet.oop.Entities.Piece;
+import com.uet.oop.ProcessingUnits.AutomaticBot;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class BombermanCommandLine {
-    public static void main(String[] args) {
+    public static boolean signal = false;
+
+    public static void main(String[] args) throws InterruptedException {
         Game game = new Game();
-        game.initialize("src/main/resources/com/uet/oop/maps/map1.txt");
-        Scanner sc = new Scanner(System.in);
-//        game.getBoard().print();
-//        System.out.print("(x, y) = ");
-//        int x = sc.nextInt();
-//        int y = sc.nextInt();
-//        game.exploreAt(x, y);
-        game.getBoard().print();
-        while (true) {
-            game.getBoard().print();
-            int op, x, y;
-            System.out.print("(x,y) = ");
-            x = sc.nextInt();
-            y = sc.nextInt();
-            Piece piece = game.getBoard().getAt(x, y);
-            if (piece == null) {
-                System.out.println("Not a piece!");
-                continue;
-            }
-            System.out.println("Using " + piece.getClass().getName());
-            System.out.print("Direction: 0 - left | 1 -> right | 2 -> up | 3 -> down\ndirection = ");
-            op = sc.nextInt();
-            if (op >= 0 && op <= 3) {
-                game.movePiece(piece, op);
-                System.out.println("Move to " + piece.getCoordinatesX() + "," + piece.getCoordinatesY());
-            } else {
-                System.out.println("Exit");
-                break;
-            }
+        game.initialize("src/main/resources/com/uet/oop/maps/map2.txt");
+        List<Piece> bots = game.getBoard().getBots();
+        List<AutomaticBot> autobots = new ArrayList<>();
+        for (Piece piece : bots) {
+            autobots.add(new AutomaticBot(game, (Bot) piece));
         }
-        sc.close();
+        for (AutomaticBot autobot : autobots) {
+            autobot.start();
+        }
+//        Bot bot = new Bot(5, 5, 2);
+//        game.getBoard().add(bot);
+//        AutomaticBot autobot = new AutomaticBot(game, bot);
+//        autobot.start();
+        while (true) {
+            Random random = new Random();
+            Thread.sleep(random.nextInt(1500));
+//            int x = random.nextInt(16);
+//            int y = random.nextInt(16);
+            game.exploreAt(1, 1);
+//            System.out.println(x + "," + y);
+        }
+    }
+
+    public static void setSignal() {
+        signal = true;
     }
 }
