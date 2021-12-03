@@ -72,17 +72,13 @@ public class Board {
     }
 
     public String toString() {
-        StringBuilder res = new StringBuilder("   ");
-        for (int i = 0; i < size; i++) {
-            res.append(String.format("%-3s", i));
-        }
+        StringBuilder res = new StringBuilder();
         res.append("\n");
         String[][] board = new String[size][size];
         for (Piece piece : pieces) {
             board[piece.getCoordinatesX()][piece.getCoordinatesY()] = piece.getSymbol();
         }
         for (int i = 0; i < size; i++) {
-            res.append(String.format("%-3s", i));
             for (int j = 0; j < size; j++) {
                 if (board[i][j] == null) res.append("   ");
                 else res.append(board[i][j]);

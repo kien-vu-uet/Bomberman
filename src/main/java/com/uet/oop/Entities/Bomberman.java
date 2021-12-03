@@ -23,8 +23,8 @@ public class Bomberman extends Piece {
         }
         Piece piece;
         if ((piece = board.getAt(x, y)) == null) return true;
-        if (piece instanceof Stone || piece instanceof Brick  || piece instanceof Bomb) return false;
-        return true;
+        return !(piece instanceof Stone) && !(piece instanceof Brick)
+                && !(piece instanceof Bomb) && !(piece instanceof Bomberman);
     }
 
     /**
