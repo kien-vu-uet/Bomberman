@@ -31,7 +31,7 @@ public class Brick extends Piece {
 
     @Override
     public String getSymbol() {
-        return "[_]";
+        return "=";
     }
 
     @Override

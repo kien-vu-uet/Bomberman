@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="540.0" prefWidth="720.0" style="-fx-background-color: #e9967a;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uet.oop.GraphicsControllers.GameController">
+   <children>
+      <Pane fx:id="settingPane" prefHeight="540.0" prefWidth="180.0" style="-fx-background-color: #e9967a;" visible="false">
+         <children>
+            <Slider fx:id="musicSlider" blockIncrement="0.1" layoutX="43.0" layoutY="87.0" max="1.0" onMouseDragged="#musicSliderOnDragged" prefHeight="14.0" prefWidth="125.0" value="1.0" />
+            <ImageView fx:id="musicIcon" fitHeight="32.0" fitWidth="31.0" layoutX="14.0" layoutY="78.0" onMouseClicked="#muteMusic" onMouseMoved="#mouseMoved" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Images/Background/music.png" />
+               </image>
+            </ImageView>
+            <Slider fx:id="soundSlider" blockIncrement="0.1" layoutX="43.0" layoutY="125.0" max="1.0" onMouseDragged="#soundSliderOnDragged" prefHeight="14.0" prefWidth="125.0" value="1.0" />
+            <ImageView fx:id="soundIcon" fitHeight="32.0" fitWidth="31.0" layoutX="13.0" layoutY="118.0" onMouseClicked="#muteSound" onMouseMoved="#mouseMoved" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Images/Background/sound.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="54.0" fitWidth="137.0" layoutX="35.0" layoutY="280.0" onMouseClicked="#resumeGame" onMouseMoved="#mouseMoved" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Images/Background/resume.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="54.0" fitWidth="137.0" layoutX="35.0" layoutY="382.0" onMouseClicked="#exitGame" onMouseMoved="#mouseMoved" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Images/Background/exit.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
+      <Pane fx:id="gamePane" layoutX="190.0" prefHeight="540.0" prefWidth="540.0">
+         <children>
+            <ImageView fitHeight="540.0" fitWidth="540.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../Images/Background/grass.png" />
+               </image>
+            </ImageView>
+         </children></Pane>
+      <ImageView fitHeight="46.0" fitWidth="53.0" layoutX="29.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Images/Bonuses/boom.gif" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="29.0" layoutY="224.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Images/Bonuses/heart.gif" />
+         </image>
+      </ImageView>
+      <Label layoutX="90.0" layoutY="152.0" text=":" textFill="#257956">
+         <font>
+            <Font name="Forte" size="40.0" />
+         </font>
+      </Label>
+      <Label fx:id="NoBomb" layoutX="116.0" layoutY="157.0" text="1" textFill="#257956">
+         <font>
+            <Font name="Forte" size="36.0" />
+         </font>
+      </Label>
+      <Label layoutX="90.0" layoutY="224.0" text=":" textFill="#257956">
+         <font>
+            <Font name="Forte" size="40.0" />
+         </font>
+      </Label>
+      <Label fx:id="NoHeart" layoutX="113.0" layoutY="228.0" text="1" textFill="#257956">
+         <font>
+            <Font name="Forte" size="36.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="45.0" fitWidth="180.0" layoutX="6.0" layoutY="47.0" pickOnBounds="true">
+         <image>
+            <Image url="@../Images/Background/bomberman.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="196.0" fitWidth="190.0" layoutY="349.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Images/Background/Icon.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="loading" fitHeight="540.0" fitWidth="730.0" pickOnBounds="true">
+         <image>
+            <Image url="@../Images/Background/loadingGame.gif" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

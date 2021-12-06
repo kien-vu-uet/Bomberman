@@ -21,7 +21,7 @@ public class Stone extends Piece {
 
     @Override
     public String getSymbol() {
-        return "[#]";
+        return "#";
     }
 
     @Override

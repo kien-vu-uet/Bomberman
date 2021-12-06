@@ -1,12 +1,15 @@
 package com.uet.oop.Entities;
 
+import javafx.scene.image.Image;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bot extends Piece {
-    public static final String IMAGE_PATH = "";
     private int level;
-
-    public Bot() {
-
-    }
+    private Image moveImages;
+    private Image deadImages;
 
     public Bot(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
@@ -18,16 +21,20 @@ public class Bot extends Piece {
         setLevel(level);
     }
 
+    private void loadImages() {
+        String p = String.valueOf(level - 1);
+        moveImages = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + ".gif").toURI().toString());
+        //
+        deadImages = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + p + ".gif").toURI().toString());
+    }
+
     public int getLevel() {
         return level;
     }
 
-    /**
-     * Set level and speed for Bot
-     * * Speed increases depending on level
-     */
     public void setLevel(int level) {
         this.level = level;
+        loadImages();
     }
 
     @Override
@@ -42,8 +49,7 @@ public class Bot extends Piece {
         }
         Piece piece;
         if ((piece = board.getAt(x, y)) == null) return true;
-        return !(piece instanceof Stone) && !(piece instanceof Brick)
-                && !(piece instanceof Bomb) && !(piece instanceof Bot);
+        return !(piece instanceof Stone) && !(piece instanceof Brick) && !(piece instanceof Bomb);
     }
 
     /**
@@ -51,7 +57,7 @@ public class Bot extends Piece {
      */
     @Override
     public String getSymbol() {
-        return "<!>";
+        return "!";
     }
 
     public void move(int direction) {

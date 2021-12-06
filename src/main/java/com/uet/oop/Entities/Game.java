@@ -12,7 +12,7 @@ public class Game {
         board.readBoard(boardFile);
     }
 
-    public static boolean validate(int x, int y) {
+    public boolean validate(int x, int y) {
         return (x >= 1 && x < Board.size - 1 && y >= 1 && y < Board.size - 1);
     }
 
