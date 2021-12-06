@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Board {
@@ -30,7 +31,7 @@ public class Board {
                     } else if (s.charAt(j) == '=') {
                         pieces.add(new Brick(i, j));
                     } else if (s.charAt(j) == '!') {
-                        pieces.add(new Bot(i, j));
+                        pieces.add(new Bot(i, j, new Random().nextInt(5)));
                     } else if (s.charAt(j) == '$') {
                         pieces.add(new Bomberman(i, j));
                     }
@@ -76,11 +77,12 @@ public class Board {
         res.append("\n");
         String[][] board = new String[size][size];
         for (Piece piece : pieces) {
+            if (piece instanceof Bot) continue;
             board[piece.getCoordinatesX()][piece.getCoordinatesY()] = piece.getSymbol();
         }
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (board[i][j] == null) res.append("   ");
+                if (board[i][j] == null) res.append(" ");
                 else res.append(board[i][j]);
             }
             res.append("\n");
