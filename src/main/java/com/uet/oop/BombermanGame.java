@@ -19,13 +19,9 @@ public class BombermanGame extends Application {
 
     @Override
     public void start(Stage stage) {
-        musicPlayer.setVolume(0.1);
         musicPlayer.play();
-        for (double i = 0.1; i <= 1; i += 0.1) {
-            musicPlayer.setVolume(i);
-        }
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXML/Home.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXML/Introduction.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 720, 540);
             stage.setTitle("Bomberman Go");
             stage.getIcons().add(new Image(new File("src/main/resources/com/uet/oop/Images/Background/Icon.png").toURI().toString()));
@@ -38,10 +34,7 @@ public class BombermanGame extends Application {
     }
 
     @FXML
-    private void playButtonOnClicked() throws IOException {
-        for (double i = 1; i > 0; i -= 0.1) {
-            musicPlayer.setVolume(i);
-        }
+    private void playButtonOnClicked() {
         musicPlayer.stop();
         new HomeController().show();
     }
