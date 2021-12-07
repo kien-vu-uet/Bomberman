@@ -179,7 +179,7 @@ public class HomeController {
             bombermanImage.add(new Image(new File("src//main//resources//com//uet//oop//Images//Bomberman//Blue//33.gif").toURI().toString()));
             bombermanImage.add(new Image(new File("src//main//resources//com//uet//oop//Images//Bomberman//Green//33.gif").toURI().toString()));
             bombermanImage.add(new Image(new File("src//main//resources//com//uet//oop//Images//Bomberman//Red//33.gif").toURI().toString()));
-            musicPlayer = new MusicPlayer("src//main//resources//com//uet//oop//Musics//Select.mp3", true);
+            musicPlayer = new MusicPlayer("src//main//resources//com//uet//oop//Musics//Select.mp3", true);//
             musicPlayer.setVolume(0.1);
             musicPlayer.play();
             for (double i = 0.1; i <= 1; i += 0.1) {
