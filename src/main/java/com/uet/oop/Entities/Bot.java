@@ -3,13 +3,11 @@ package com.uet.oop.Entities;
 import javafx.scene.image.Image;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Bot extends Piece {
     private int level;
-    private Image moveImages;
-    private Image deadImages;
+    private Image moveImage;
+    private Image deadImage;
 
     public Bot(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
@@ -23,9 +21,17 @@ public class Bot extends Piece {
 
     private void loadImages() {
         String p = String.valueOf(level - 1);
-        moveImages = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + ".gif").toURI().toString());
+        moveImage = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + ".gif").toURI().toString());
         //
-        deadImages = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + p + ".gif").toURI().toString());
+        deadImage = new Image(new File("src//main//resources//com//uet//oop//Images//Bot//" + p + p + ".gif").toURI().toString());
+    }
+
+    public Image getMoveImage() {
+        return moveImage;
+    }
+
+    public Image getDeadImage() {
+        return deadImage;
     }
 
     public int getLevel() {
@@ -42,10 +48,10 @@ public class Bot extends Piece {
         int x = super.getCoordinatesX();
         int y = super.getCoordinatesY();
         switch (direction) {
-            case (0) -> y -= 1;
-            case (1) -> y += 1;
-            case (2) -> x -= 1;
-            case (3) -> x += 1;
+            case (2) -> y -= 1;
+            case (3) -> y += 1;
+            case (0) -> x -= 1;
+            case (1) -> x += 1;
         }
         Piece piece;
         if ((piece = board.getAt(x, y)) == null) return true;
@@ -64,10 +70,10 @@ public class Bot extends Piece {
         int x = super.getCoordinatesX();
         int y = super.getCoordinatesY();
         switch (direction) {
-            case (0) -> super.setCoordinatesY(y - 1);
-            case (1) -> super.setCoordinatesY(y + 1);
-            case (2) -> super.setCoordinatesX(x - 1);
-            case (3) -> super.setCoordinatesX(x + 1);
+            case (2) -> super.setCoordinatesY(y - 1);
+            case (3) -> super.setCoordinatesY(y + 1);
+            case (0) -> super.setCoordinatesX(x - 1);
+            case (1) -> super.setCoordinatesX(x + 1);
         }
     }
 }

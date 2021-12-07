@@ -19,6 +19,7 @@
 ##################
 
 # is stone
-0 - 4 is bot
+! is bot
 = is brick
 $ is bomberman
+* is bomb

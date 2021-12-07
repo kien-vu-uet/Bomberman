@@ -1,14 +1,27 @@
 package com.uet.oop.Entities;
 
+import javafx.scene.image.Image;
+
+import java.io.File;
+
 public class Stone extends Piece {
-    public static final String IMAGE_PATH = "";
+    private Image standingImage;
 
     public Stone() {
-
+        loadImage();
     }
 
     public Stone(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
+        loadImage();
+    }
+
+    public void loadImage() {
+        standingImage = new Image(new File("src//main//resources//com//uet//oop//Images//BrickFires//28.gif").toURI().toString());
+    }
+
+    public Image getStandingImage() {
+        return standingImage;
     }
 
     /**

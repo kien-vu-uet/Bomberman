@@ -11,14 +11,23 @@ public class Bomberman extends Piece {
     private List<Image> standingImages;
     private List<Image> movingImages;
     private String color;
+    private int numOfBombs;
+    private int healthPoint;
+    private boolean isAlive;
 
     public Bomberman(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
         setColor("Yellow");
+        numOfBombs = 1;
+        healthPoint = 1;
+        isAlive = true;
     }
     public Bomberman(int coordinatesX, int coordinatesY, String color) {
         super(coordinatesX, coordinatesY);
-        setColor("Yellow");
+        setColor(color);
+        numOfBombs = 1;
+        healthPoint = 1;
+        isAlive = true;
     }
 
     public String getColor() {
@@ -28,6 +37,35 @@ public class Bomberman extends Piece {
     public void setColor(String color) {
         this.color = color;
         loadImages();
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public int getNumOfBombs() {
+        return numOfBombs;
+    }
+
+    public int getHealthPoint() {
+        return healthPoint;
+    }
+
+    public void useBomb() {
+        numOfBombs--;
+    }
+
+    public void equipBomb() {
+        numOfBombs++;
+    }
+
+    public void bleed() {
+        healthPoint--;
+        if (healthPoint <= 0) isAlive = false;
+    }
+
+    public void heal() {
+        healthPoint++;
     }
 
     private void loadImages() {
@@ -64,10 +102,10 @@ public class Bomberman extends Piece {
         int x = super.getCoordinatesX();
         int y = super.getCoordinatesY();
         switch (direction) {
-            case (0) -> y = y - 1;
-            case (1) -> y = y + 1;
-            case (2) -> x = x - 1;
-            case (3) -> x = x + 1;
+            case (2) -> y = y - 1;
+            case (3) -> y = y + 1;
+            case (0) -> x = x - 1;
+            case (1) -> x = x + 1;
         }
         Piece piece;
         if ((piece = board.getAt(x, y)) == null) return true;
@@ -87,10 +125,10 @@ public class Bomberman extends Piece {
         int x = super.getCoordinatesX();
         int y = super.getCoordinatesY();
         switch (direction) {
-            case (0) -> super.setCoordinatesY(y - 1);
-            case (1) -> super.setCoordinatesY(y + 1);
-            case (2) -> super.setCoordinatesX(x - 1);
-            case (3) -> super.setCoordinatesX(x + 1);
+            case (2) -> super.setCoordinatesY(y - 1);
+            case (3) -> super.setCoordinatesY(y + 1);
+            case (0) -> super.setCoordinatesX(x - 1);
+            case (1) -> super.setCoordinatesX(x + 1);
         }
     }
 }
