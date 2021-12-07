@@ -13,23 +13,22 @@ import java.io.File;
 import java.io.IOException;
 
 public class BombermanGame extends Application {
-    @FXML public static Stage mainStage;
-    @FXML private MusicPlayer musicPlayer;
-
+    public static Stage mainStage;
+    private static final MusicPlayer musicPlayer =
+            new MusicPlayer("src//main//resources//com//uet//oop//Musics//Title.mp3", true);
 
     @Override
     public void start(Stage stage) {
+        musicPlayer.setVolume(0.1);
+        musicPlayer.play();
+        for (double i = 0.1; i <= 1; i += 0.1) {
+            musicPlayer.setVolume(i);
+        }
         try {
-            musicPlayer = new MusicPlayer("src//main//resources//com//uet//oop//Musics//Title.mp3", true);
-            musicPlayer.setVolume(0.1);
-            musicPlayer.play();
-            for (double i = 0.1; i <= 1; i += 0.1) {
-                musicPlayer.setVolume(i);
-            }
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("src//main/resources//com//uet//oop//FXML//Introduction.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXML/Home.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 720, 540);
             stage.setTitle("Bomberman Go");
-            stage.getIcons().add(new Image(new File("src//main//resources//com//uet//oop//Images//Background//Icon.png").toURI().toString()));
+            stage.getIcons().add(new Image(new File("src/main/resources/com/uet/oop/Images/Background/Icon.png").toURI().toString()));
             stage.setScene(scene);
             mainStage = stage;
             stage.show();
