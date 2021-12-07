@@ -9,11 +9,11 @@ import java.util.Scanner;
 
 public class Board {
     private static List<Piece> pieces;
-    public static int size;
+    public static int length;
 
     public Board() {
         pieces = new ArrayList<>();
-        size = 0;
+        length = 0;
     }
 
     void readBoard(String path) {
@@ -21,11 +21,11 @@ public class Board {
             File file = new File(path);
             if (!file.exists()) System.err.println("File not found");
             Scanner sc = new Scanner(file);
-            size = sc.nextInt();
+            length = sc.nextInt();
             sc.nextLine();
-            for (int i = 0; i < size && sc.hasNextLine(); i++) {
+            for (int j = 0; j < length && sc.hasNextLine(); j++) {
                 String s = sc.nextLine();
-                for (int j = 0; j < s.length(); j++) {
+                for (int i = 0; i < s.length(); i++) {
                     if (s.charAt(j) == '#') {
                         pieces.add(new Stone(i, j));
                     } else if (s.charAt(j) == '=') {
@@ -75,13 +75,13 @@ public class Board {
     public String toString() {
         StringBuilder res = new StringBuilder();
         res.append("\n");
-        String[][] board = new String[size][size];
+        String[][] board = new String[length][length];
         for (Piece piece : pieces) {
             if (piece instanceof Bot) continue;
             board[piece.getCoordinatesX()][piece.getCoordinatesY()] = piece.getSymbol();
         }
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
                 if (board[i][j] == null) res.append(" ");
                 else res.append(board[i][j]);
             }
@@ -90,13 +90,33 @@ public class Board {
         return res.toString();
     }
 
-    public List<Piece> getBots() {
-        List<Piece> bots = new ArrayList<>();
+    public List<Bot> getBots() {
+        List<Bot> bots = new ArrayList<>();
         for (Piece piece : pieces) {
             if (piece instanceof Bot) {
-                bots.add(piece);
+                bots.add((Bot) piece);
             }
         }
         return bots;
+    }
+
+    public List<Bomberman> getBombermans() {
+        List<Bomberman> bombermans = new ArrayList<>();
+        for (Piece piece : pieces) {
+            if (piece instanceof Bomberman) {
+                bombermans.add((Bomberman) piece);
+            }
+        }
+        return bombermans;
+    }
+
+    public List<Bomb> getBombs() {
+        List<Bomb> bombs = new ArrayList<>();
+        for (Piece piece : pieces) {
+            if (piece instanceof Bomb) {
+                bombs.add((Bomb) piece);
+            }
+        }
+        return bombs;
     }
 }

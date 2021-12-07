@@ -1,7 +1,10 @@
 package com.uet.oop.GraphicsControllers;
 
 import com.uet.oop.BombermanGame;
+import com.uet.oop.Entities.Bomberman;
+import com.uet.oop.Entities.Game;
 import com.uet.oop.ProcessingUnits.MusicPlayer;
+import com.uet.oop.ProcessingUnits.RunningGame;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,16 +33,19 @@ public class HomeController {
     private MusicPlayer selectSound;
     private MusicPlayer moveSound;
     private List<ImageView> images;
+    private int mapIndex = 0;
 
     @FXML
     private void previousMap() {
         selectSound.play();
+        mapIndex--;
         System.out.println("previous map");
     }
 
     @FXML
     private void nextMap() {
         selectSound.play();
+        mapIndex++;
         System.out.println("next map");
     }
 
@@ -65,7 +71,16 @@ public class HomeController {
             musicPlayer.setVolume(i);
         }
         musicPlayer.stop();
-        new GameController().show();
+        selectSound.stop();
+        moveSound.stop();
+        //
+        Game game = new Game();
+        game.initialize("src//main//resources//com//uet//oop//Maps//map1.txt");
+        Bomberman bomberman = (Bomberman) game.getBoard().getAt(1, 1);
+        GameController gc = new GameController(game, bomberman);
+        RunningGame rg = new RunningGame(game, gc, bomberman);
+        gc.show(musicSlider.getValue(), soundSlider.getValue());
+        rg.start();
     }
 
     @FXML
@@ -83,7 +98,7 @@ public class HomeController {
             musicPlayer.stop();
             selectSound.stop();
             moveSound.stop();
-            System.exit(0);
+            new BombermanGame().start(BombermanGame.mainStage);
         }
     }
 

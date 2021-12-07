@@ -28,6 +28,23 @@ public class MusicPlayer {
         }
     }
 
+    public MusicPlayer(String path, boolean repeat, double volume) {
+        File file = new File(path);
+        if (!file.exists()) System.err.println("File not found!");
+        media = new Media(file.toURI().toString());
+        mediaPlayer = new MediaPlayer(media);
+        this.repeat = repeat;
+        if (repeat) {
+            mediaPlayer.setOnEndOfMedia(new Runnable() {
+                @Override
+                public void run() {
+                    mediaPlayer.seek(Duration.ZERO);
+                }
+            });
+        }
+        setVolume(volume);
+    }
+
     public MusicPlayer() {
 
     }

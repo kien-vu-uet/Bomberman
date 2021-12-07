@@ -16,6 +16,8 @@ public class BombermanCommandLine {
         Game game = new Game();
         game.initialize("src/main/resources/com/uet/oop/maps/map1.txt");
         game.getBoard().print();
+        game.bombAt(2, 12);
+        game.getBoard().print();
 //        List<Piece> bots = game.getBoard().getBots();
 //        List<AutomaticBot> autobots = new ArrayList<>();
 //        for (Piece piece : bots) {
