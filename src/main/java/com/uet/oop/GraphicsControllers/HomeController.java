@@ -4,15 +4,15 @@ import com.uet.oop.BombermanGame;
 import com.uet.oop.Entities.Bomberman;
 import com.uet.oop.Entities.Game;
 import com.uet.oop.ProcessingUnits.MusicPlayer;
-import com.uet.oop.ProcessingUnits.RunningGame;
+import com.uet.oop.ProcessingUnits.GameRunner;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -25,13 +25,19 @@ public class HomeController {
     @FXML private Slider soundSlider;
     @FXML private ImageView musicIcon;
     @FXML private ImageView soundIcon;
+    @FXML private Label status;
+
+    public static int HIGHEST_LEVEL = 1;
+    public static int SELECTED_LEVEL = 1;
+    private boolean sttCheck = true;
 
     private static final List<Image> bombermanImage = new ArrayList<>(Arrays.asList(
-            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Yellow/33.gif").toURI().toString()),
-            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Blue/33.gif").toURI().toString()),
-            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Green/33.gif").toURI().toString()),
-            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Red/33.gif").toURI().toString())
+            new Image(new File("src/main/resources/com/uet/oop/Images/Background/1.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Background/2.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Background/3.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Background/4.gif").toURI().toString())
     ));
+    private static List<Image> mapImages = new ArrayList<>();
     private int imageIndex = 0;
     private static final MusicPlayer musicPlayer = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Select.mp3", true);
     private static final MusicPlayer selectSound = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Select.wav", false);
@@ -44,14 +50,34 @@ public class HomeController {
     private void previousMap() {
         selectSound.play();
         mapIndex--;
-        System.out.println("previous map");
+        if (mapIndex < 0) mapIndex += mapImages.size();
+        map.setImage(mapImages.get(mapIndex));
+        sttCheck = (mapIndex <= HIGHEST_LEVEL - 1);
+        if (!sttCheck) {
+            status.setText("Lock");
+            status.setTextFill(Color.RED);
+        } else {
+            status.setText("Unlock");
+            status.setTextFill(Color.GREEN);
+        }
+        System.out.println(mapIndex + " " + HIGHEST_LEVEL);
     }
 
     @FXML
     private void nextMap() {
         selectSound.play();
         mapIndex++;
-        System.out.println("next map");
+        mapIndex = mapIndex % mapImages.size();
+        map.setImage(mapImages.get(mapIndex));
+        sttCheck = (mapIndex <= HIGHEST_LEVEL - 1);
+        if (!sttCheck) {
+            status.setText("Lock");
+            status.setTextFill(Color.RED);
+        } else {
+            status.setText("Unlock");
+            status.setTextFill(Color.GREEN);
+        }
+        System.out.println(mapIndex + " " + HIGHEST_LEVEL);
     }
 
     @FXML
@@ -76,21 +102,27 @@ public class HomeController {
         soundVolume = selectSound.getVolume();
 
         selectSound.play();
+
+        if (!sttCheck) return;
+        SELECTED_LEVEL = mapIndex + 1;
+
         musicPlayer.stop();
         selectSound.stop();
 
         Game game = new Game();
-        game.initialize("src/main/resources/com/uet/oop/Maps/map2.txt");
+        String mp = "map_" + (SELECTED_LEVEL) + ".txt";
+        game.initialize("src/main/resources/com/uet/oop/Maps/" + mp);
         Bomberman bomberman = game.getBoard().getBomberman();
         switch(imageIndex) {
             case (0) -> bomberman.setColor("Yellow");
-            case (1) -> bomberman.setColor("Blue");
-            case (2) -> bomberman.setColor("Green");
-            case (3) -> bomberman.setColor("Red");
+            case (1) -> bomberman.setColor("Green");
+            case (2) -> bomberman.setColor("Red");
+            case (3) -> bomberman.setColor("Blue");
         }
         GameController gc = new GameController();
-        RunningGame rg = new RunningGame(gc);
+        GameRunner rg = new GameRunner(gc);
         gc.show(game, bomberman);
+        gc.setLoadingDone();
         rg.start();
     }
 
@@ -160,6 +192,12 @@ public class HomeController {
 
     public void show() {
         musicPlayer.play();
+        String p = "src/main/resources/com/uet/oop/Images/Maps/map";
+        for (int i = 1; i <= 10; i++) {
+            mapImages.add(
+                new Image(new File(p + i + ".png").toURI().toString())
+            );
+        }
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(BombermanGame.class.getResource("FXML/Home.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 720, 540);

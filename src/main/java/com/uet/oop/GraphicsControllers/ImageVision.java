@@ -20,6 +20,7 @@ public class ImageVision {
         imgview.setPreserveRatio(true);
         imgview.setLayoutX(x);
         imgview.setLayoutY(y);
+        if (piece instanceof Bomberman) imgview.setX(7);
         setOnStanding();
     }
 
