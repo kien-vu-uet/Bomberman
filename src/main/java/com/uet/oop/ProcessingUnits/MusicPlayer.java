@@ -18,14 +18,13 @@ public class MusicPlayer {
         media = new Media(file.toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         this.repeat = repeat;
-        if (repeat) {
-            mediaPlayer.setOnEndOfMedia(new Runnable() {
-                @Override
-                public void run() {
-                    mediaPlayer.seek(Duration.ZERO);
-                }
-            });
-        }
+        mediaPlayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                mediaPlayer.seek(Duration.ZERO);
+                if (!repeat) mediaPlayer.pause();
+            }
+        });
     }
 
     public MusicPlayer(String path, boolean repeat, double volume) {
@@ -55,14 +54,13 @@ public class MusicPlayer {
 
     public void setRepeat(boolean repeat) {
         this.repeat = repeat;
-        if (repeat) {
-            mediaPlayer.setOnEndOfMedia(new Runnable() {
-                @Override
-                public void run() {
-                    mediaPlayer.seek(Duration.ZERO);
-                }
-            });
-        }
+        mediaPlayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                mediaPlayer.seek(Duration.ZERO);
+                if (!repeat) mediaPlayer.pause();
+            }
+        });
     }
 
     public String getPath() {
@@ -84,6 +82,8 @@ public class MusicPlayer {
     }
 
     public void play() {
+        if (!repeat) mediaPlayer.seek(mediaPlayer.getStartTime());
+        if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) return;
         mediaPlayer.play();
     }
 
@@ -92,6 +92,7 @@ public class MusicPlayer {
     }
 
     public void pause() {
+        if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED)) return;
         mediaPlayer.pause();
     }
 }

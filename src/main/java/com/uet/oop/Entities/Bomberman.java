@@ -4,30 +4,29 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class Bomberman extends Piece {
-    public static final int WIDTH = 18;
+    public static final double DURATION = 0.25;//seconds
+    public static final double STUNNED_TIME = 3;
     private List<Image> standingImages;
     private List<Image> movingImages;
     private String color;
-    private int numOfBombs;
-    private int healthPoint;
-    private boolean isAlive;
+    private int numOfBombs = 1;
+    private int healthPoint = 1;
+    private long lastTimeMove;
+    private Queue<Long> lastTimeBomb = new LinkedList<>();
+    private int lastMoveDirection = 3;
 
     public Bomberman(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
         setColor("Yellow");
-        numOfBombs = 1;
-        healthPoint = 1;
-        isAlive = true;
     }
     public Bomberman(int coordinatesX, int coordinatesY, String color) {
         super(coordinatesX, coordinatesY);
         setColor(color);
-        numOfBombs = 1;
-        healthPoint = 1;
-        isAlive = true;
     }
 
     public String getColor() {
@@ -39,8 +38,12 @@ public class Bomberman extends Piece {
         loadImages();
     }
 
+    public boolean ableToMove() {
+        return (System.nanoTime() - lastTimeMove >= DURATION * 1.05e9);
+    }
+
     public boolean isAlive() {
-        return isAlive;
+        return healthPoint > 0;
     }
 
     public int getNumOfBombs() {
@@ -53,6 +56,7 @@ public class Bomberman extends Piece {
 
     public void useBomb() {
         numOfBombs--;
+        lastTimeBomb.add(System.nanoTime());
     }
 
     public void equipBomb() {
@@ -61,40 +65,71 @@ public class Bomberman extends Piece {
 
     public void bleed() {
         healthPoint--;
-        if (healthPoint <= 0) isAlive = false;
+        if (healthPoint <= 0) {
+            System.out.println("dead");
+        } else {
+            lastTimeMove += STUNNED_TIME * 1e9;
+            lastTimeBomb.forEach(l -> {
+                l += (long) (STUNNED_TIME * 1e9);
+            });
+        }
+    }
+
+    public boolean isStunned() {
+        return (lastTimeMove > System.nanoTime());
     }
 
     public void heal() {
         healthPoint++;
     }
 
+    public void restoreBomb() {
+        while (!lastTimeBomb.isEmpty()) {
+            if (System.nanoTime() - lastTimeBomb.peek() >= Bomb.EXISTED_TIME * 1e9) {
+                numOfBombs++;
+                lastTimeBomb.remove();
+                System.out.println("restored");
+            } else break;
+        }
+    }
+
     private void loadImages() {
-        String path = "src//main//resources//com//uet//oop//Images//Bomberman//" + color;
+        String path = "src/main/resources/com/uet/oop/Images/Bomberman/" + color;
         standingImages = new ArrayList<>();
-        standingImages.add(new Image(new File(path + "//00.gif").toURI().toString()));
-        standingImages.add(new Image(new File(path + "//11.gif").toURI().toString()));
-        standingImages.add(new Image(new File(path + "//22.gif").toURI().toString()));
-        standingImages.add(new Image(new File(path + "//33.gif").toURI().toString()));
+        standingImages.add(new Image(new File(path + "/00.gif").toURI().toString()));
+        standingImages.add(new Image(new File(path + "/11.gif").toURI().toString()));
+        standingImages.add(new Image(new File(path + "/22.gif").toURI().toString()));
+        standingImages.add(new Image(new File(path + "/33.gif").toURI().toString()));
         //
         movingImages = new ArrayList<>();
-        movingImages.add(new Image(new File(path + "//0.gif").toURI().toString()));
-        movingImages.add(new Image(new File(path + "//1.gif").toURI().toString()));
-        movingImages.add(new Image(new File(path + "//2.gif").toURI().toString()));
-        movingImages.add(new Image(new File(path + "//3.gif").toURI().toString()));
+        movingImages.add(new Image(new File(path + "/0.gif").toURI().toString()));
+        movingImages.add(new Image(new File(path + "/1.gif").toURI().toString()));
+        movingImages.add(new Image(new File(path + "/2.gif").toURI().toString()));
+        movingImages.add(new Image(new File(path + "/3.gif").toURI().toString()));
         //
-        movingImages.add(new Image(new File(path + "//4.gif").toURI().toString()));
+        movingImages.add(new Image(new File(path + "/4.gif").toURI().toString()));
     }
 
-    public Image getStandingImage(int direction) {
-        return standingImages.get(direction);
+    public Image getStandingImage() {
+        return standingImages.get(lastMoveDirection);
     }
 
-    public Image getMovingImage(int direction) {
-        return movingImages.get(direction);
+    public Image getMoveImage() {
+        return movingImages.get(lastMoveDirection);
     }
 
-    public Image getExploringImage() {
+    public Image getExplosionImage() {
         return movingImages.get(4);
+    }
+
+    public boolean isInExplosionRangeOf(Bomb bomb) {
+        int x1 = bomb.getCoordinatesX();
+        int y1 = bomb.getCoordinatesY();
+        int x2 = super.getCoordinatesX();
+        int y2 = super.getCoordinatesY();
+        if (x1 == x2 && Math.abs(y1 - y2) <= Bomb.RADIUS) return true;
+        if (y1 == y2 && Math.abs(x1 - x2) <= Bomb.RADIUS) return true;
+        return false;
     }
 
     @Override
@@ -125,10 +160,23 @@ public class Bomberman extends Piece {
         int x = super.getCoordinatesX();
         int y = super.getCoordinatesY();
         switch (direction) {
-            case (2) -> super.setCoordinatesY(y - 1);
-            case (3) -> super.setCoordinatesY(y + 1);
-            case (0) -> super.setCoordinatesX(x - 1);
-            case (1) -> super.setCoordinatesX(x + 1);
+            case (2) -> {
+                super.setCoordinatesY(y - 1);
+                lastTimeMove = System.nanoTime();
+            }
+            case (3) -> {
+                super.setCoordinatesY(y + 1);
+                lastTimeMove = System.nanoTime();
+            }
+            case (0) -> {
+                super.setCoordinatesX(x - 1);
+                lastTimeMove = System.nanoTime();
+            }
+            case (1) -> {
+                super.setCoordinatesX(x + 1);
+                lastTimeMove = System.nanoTime();
+            }
         }
+        lastMoveDirection = direction;
     }
 }

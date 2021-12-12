@@ -3,17 +3,21 @@ package com.uet.oop.GraphicsControllers;
 import com.uet.oop.BombermanGame;
 import com.uet.oop.Entities.*;
 import com.uet.oop.ProcessingUnits.MusicPlayer;
+import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,139 +26,46 @@ import java.util.List;
 public class GameController {
     public static final int SIZE = 30;
 
-    private MusicPlayer musicPlayer;
-    private MusicPlayer selectSound;
-    private MusicPlayer moveSound;
-    private MusicPlayer explosionSound;
-    private Game game;
-    private List<ImageView> imageViews;
-    private ImageView bombermanImgView;
-    private Bomberman bomberman;
-    public static boolean isRunning;
-    public static boolean paused;
+    private static final MusicPlayer battleMusic
+            = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Battle.mp3", true);
+    private static final MusicPlayer explosionSound
+            = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Explosion.mp3", false);
+    private static final MusicPlayer bonusSound
+            = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Bonus.wav", false);
+    private static final MusicPlayer clockSound
+            = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/clock.wav", true);
+    private static final MusicPlayer loadingMusic
+            = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Loading.mp3", true);
+    private static final MusicPlayer endingMusic
+            = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Victory.mp3", true);
+    private static final MusicPlayer defeatSound
+            = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Defeat.wav", false);
 
-    @FXML private Scene settingScene;
-    @FXML private Scene playingScene;
-    @FXML private Stage stage;
+    private List<ImageVision> imageVisions;
+    private ImageVision bombermanImgVision;
+    public Game game;
+    public Bomberman bomberman;
+    public List<Bot> bots;
+
+    public double musicVolume = 1;
+    public double soundVolume = 1;
+    private long lastTime;
+
     @FXML private Pane pane;
-    @FXML private Label NoBombs;
+    @FXML private Label numOfBombs;
     @FXML private Label healthPoint;
+    @FXML private Label minutesLabel;
+    @FXML private Label secondsLabel;
+    @FXML private ImageView loadingview;
 
-    @FXML private ImageView musicIcon;
-    @FXML private ImageView soundIcon;
-    @FXML private Slider musicSlider;
-    @FXML private Slider soundSlider;
-    @FXML private ImageView loading;
-    @FXML private Pane gamePane;
-
-    @FXML
-    private void musicSliderOnDragged() {
-        selectSound.play();
-        double value = musicSlider.getValue();
-        if (value == 0) {
-            musicIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteMusic.png").toURI().toString()));
-            musicPlayer.setVolume(0);
-        } else {
-            musicIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//music.png").toURI().toString()));
-            musicPlayer.setVolume(value);
-        }
-    }
-
-    @FXML
-    private void muteMusic() {
-        selectSound.play();
-        if (musicSlider.getValue() > 0) {
-            musicIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteMusic.png").toURI().toString()));
-            musicSlider.setValue(0);
-            musicPlayer.setVolume(0);
-        } else {
-            musicIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//music.png").toURI().toString()));
-            musicSlider.setValue(1);
-            musicPlayer.setVolume(1);
-        }
-    }
-
-    @FXML
-    private void soundSliderOnDragged() {
-        selectSound.play();
-        double value = soundSlider.getValue();
-        if (value == 0) {
-            soundIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteSound.png").toURI().toString()));
-            selectSound.setVolume(0);
-            moveSound.setVolume(0);
-            explosionSound.setVolume(0);
-        } else {
-            soundIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//sound.png").toURI().toString()));
-            selectSound.setVolume(value);
-            moveSound.setVolume(value);
-            explosionSound.setVolume(value);
-        }
-    }
-
-    @FXML
-    private void muteSound() {
-        selectSound.play();
-        if (soundSlider.getValue() > 0) {
-            soundIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteSound.png").toURI().toString()));
-            soundSlider.setValue(0);
-            selectSound.setVolume(0);
-            moveSound.setVolume(0);
-            explosionSound.setVolume(0);
-        } else {
-            soundIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//sound.png").toURI().toString()));
-            soundSlider.setValue(1);
-            selectSound.setVolume(1);
-            moveSound.setVolume(1);
-            explosionSound.setVolume(1);
-        }
-    }
-
-    @FXML
-    private void resumeGame() {
-        selectSound.play();
-        if (isRunning) {
-            paused = false;
-            stage.setScene(playingScene);
-        }
-    }
-
-    @FXML
-    private void exitGame() {
-        selectSound.play();
-        isRunning = false;
-
-    }
-
-    @FXML
-    private void mouseMoved() {
-        moveSound.play();
-    }
-
-    public GameController(Game game, Bomberman bomberman) {
+    public void show(Game game, Bomberman bomberman) {
         this.game = game;
         this.bomberman = bomberman;
-    }
-
-
-    public void show(double musicVolume, double soundVolume) {
-        musicPlayer = new MusicPlayer("src//main//resources//com//uet//oop//Musics//Battle.mp3", true);
-        musicPlayer.setVolume(0.1);
-        musicPlayer.play();
-        for (double i = 0.1; i <= musicVolume; i += 0.1) {
-            musicPlayer.setVolume(i);
-        }
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("src//main//resources//com//uet//oop//FXML//InGame.fxml"));
-            settingScene = new Scene(fxmlLoader.load(), 720, 540);
-            stage = BombermanGame.mainStage;
-            stage.setScene(settingScene);
-            stage.show();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        selectSound = new MusicPlayer("src//main//resources//com//uet//oop//Sounds//Select.wav", false, soundVolume);
-        moveSound = new MusicPlayer("src//main//resources//com//uet//oop//Sounds//Move.wav", false, soundVolume);
-        explosionSound = new MusicPlayer("src//main//resources//com//uet//oop//Sounds//Explosion.mp3", false, soundVolume);
+        this.bots = game.getBoard().getBots();
+        musicVolume = HomeController.musicVolume;
+        soundVolume = HomeController.soundVolume;
+        loadingMusic.play();
+        setVolume(musicVolume, soundVolume);
 
         pane = new Pane();
         pane.setPrefSize(540, 540);
@@ -162,77 +73,87 @@ public class GameController {
         pane.setLayoutY(0);
         pane.setStyle("-fx-background-color: #32cd32");
 
-        for (Piece piece : game.getBoard().getPieces()) {
-            int x = piece.getCoordinatesX() * SIZE;
-            int y = piece.getCoordinatesY() * SIZE;
-            ImageView imgview = new ImageView();
-            imgview.setPreserveRatio(true);
-            if (piece instanceof Bomberman) {
-                imgview.setImage(((Bomberman) piece).getStandingImage(3));
-                imgview.setFitWidth(20);
-                imgview.setLayoutX(x + 5);
-                imgview.setLayoutY(y);
-                bombermanImgView = imgview;
-            } else if (piece instanceof Bot) {
-                imgview.setImage(((Bot) piece).getMoveImage());
-                imgview.setFitWidth(SIZE);
-                imgview.setLayoutX(x);
-                imgview.setLayoutY(y);
-            } else if (piece instanceof Brick) {
-                imgview.setImage(((Brick) piece).getStandingImage());
-                imgview.setFitWidth(SIZE);
-                imgview.setLayoutX(x);
-                imgview.setLayoutY(y);
-            } else if (piece instanceof Stone) {
-                imgview.setImage(((Stone) piece).getStandingImage());
-                imgview.setFitWidth(SIZE);
-                imgview.setLayoutX(x);
-                imgview.setLayoutY(y);
-            } else if (piece instanceof Bomb) {
-                imgview.setImage(((Bomb) piece).getBombImage());
-                imgview.setFitWidth(SIZE);
-                imgview.setLayoutX(x);
-                imgview.setLayoutY(y);
-            }
-            imageViews.add(imgview);
-        }
-        pane.getChildren().addAll(imageViews);
-        gamePane = pane;
+        imageVisions = new ArrayList<>();
+
+        List<Piece> pieces = game.getBoard().getPieces();
+        pieces.forEach(piece -> {
+            ImageVision imgvision = new ImageVision(piece);
+            imageVisions.add(imgvision);
+            if (!(piece instanceof Bomberman)) pane.getChildren().add(imgvision.getImageView());
+            else bombermanImgVision = imgvision;
+        });
+
+        pane.getChildren().add(bombermanImgVision.getImageView());
 
         ImageView leftside = new ImageView();
-        leftside.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//LeftSide.gif").toURI().toString()));
-        leftside.setPreserveRatio(true);
+        leftside.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/leftSide.gif").toURI().toString()));
+        leftside.setPreserveRatio(false);
+        leftside.setFitHeight(540);
+        leftside.setFitWidth(180);
         leftside.setLayoutX(0);
         leftside.setLayoutY(0);
 
-        NoBombs = new Label(String.valueOf(bomberman.getNumOfBombs()));
-        NoBombs.setFont(new Font(48));
-        NoBombs.setLayoutX(125);
-        NoBombs.setLayoutY(235);
+        numOfBombs = new Label(String.valueOf(this.bomberman.getNumOfBombs()));
+        numOfBombs.setFont(Font.font("Snap ITC", 36));
+        numOfBombs.setLayoutX(115);
+        numOfBombs.setLayoutY(305);
+        numOfBombs.setTextFill(Color.BLACK);
 
-        healthPoint = new Label(String.valueOf(bomberman.getHealthPoint()));
-        healthPoint.setFont(new Font(48));
-        healthPoint.setLayoutX(125);
-        healthPoint.setLayoutY(298);
+        healthPoint = new Label(String.valueOf(this.bomberman.getHealthPoint()));
+        healthPoint.setFont(Font.font("Snap ITC", 36));
+        healthPoint.setLayoutX(115);
+        healthPoint.setLayoutY(245);
+        healthPoint.setTextFill(Color.DARKVIOLET);
+
+        minutesLabel = new Label();
+        minutesLabel.setFont(Font.font("Snap ITC", 36));
+        minutesLabel.setLayoutX(20);
+        minutesLabel.setLayoutY(180);
+
+        secondsLabel = new Label();
+        secondsLabel.setFont(Font.font("Snap ITC", 36));
+        secondsLabel.setLayoutX(105);
+        secondsLabel.setLayoutY(180);
+
+        loadingview = new ImageView(
+                new Image(new File("src/main/resources/com/uet/oop/Images/Background/loadingGame.gif").toURI().toString())
+        );
+        loadingview.setFitWidth(720);
+        loadingview.setFitHeight(540);
+        loadingview.setPreserveRatio(false);
+        loadingview.setLayoutX(0);
+        loadingview.setLayoutY(0);
 
         Pane root = new Pane();
         root.setPrefSize(720, 540);
-        root.getChildren().addAll(leftside, pane, NoBombs, healthPoint);
+        root.getChildren().addAll(leftside, pane, numOfBombs, healthPoint, loadingview, minutesLabel, secondsLabel);
+        Scene playingScene;
         playingScene = new Scene(root, 720, 540);
         playingScene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
             switch (keyEvent.getCode()) {
-                case ESCAPE -> stage.setScene(settingScene);
-                case A -> moveBomberman(0);
-                case D -> moveBomberman(1);
-                case W -> moveBomberman(2);
-                case S -> moveBomberman(3);
-                case SPACE -> bomb();
+                case ESCAPE -> {
+                    game.pause();
+                    battleMusic.pause();
+                    clockSound.pause();
+                    showGameSettings();
+                }
+                case LEFT, A -> moveBomberman(0);
+                case RIGHT, D -> moveBomberman(1);
+                case UP, W -> moveBomberman(2);
+                case DOWN, S -> moveBomberman(3);
+                case NUMPAD0, SPACE -> bomb();
             }
-            NoBombs.setText(String.valueOf(bomberman.getNumOfBombs()));
-            healthPoint.setText(String.valueOf(bomberman.getHealthPoint()));
+            numOfBombs.setText(String.valueOf(this.bomberman.getNumOfBombs()));
+            healthPoint.setText(String.valueOf(this.bomberman.getHealthPoint()));
         });
 
-        loading.setVisible(false);
+        Stage stage = BombermanGame.mainStage;
+        stage.setScene(playingScene);
+        stage.setOnCloseRequest(windowEvent -> {
+            game.stop();
+            stage.close();
+        });
+        stage.show();
     }
 
     public void bomb() {
@@ -241,113 +162,250 @@ public class GameController {
         int y = bomberman.getCoordinatesY();
         Bomb bomb = game.bombAt(x, y);
         bomberman.useBomb();
-        ImageView bombview = new ImageView(bomb.getBombImage());
-        bombview.setFitWidth(SIZE);
-        bombview.setPreserveRatio(true);
-        bombview.setLayoutX(bomb.getCoordinatesY());
-        bombview.setLayoutY(bomb.getCoordinatesX());
-        imageViews.add(bombview);
-        pane.getChildren().add(bombview);
+        ImageVision bombVision = new ImageVision(bomb);
+        imageVisions.add(bombVision);
+        pane.getChildren().add(bombVision.getImageView());
     }
 
-    public void explore(List<Piece> deadPieces) {
-        List<Integer> index = new ArrayList<>();
-        for (Piece piece : deadPieces) {
-            int i = game.getBoard().getPieces().indexOf(piece);
-            index.add(i);
-            if (piece instanceof Brick) {
-                imageViews.get(i).setImage(((Brick) piece).getExplorationImage());
-            } else if (piece instanceof Bot) {
-                imageViews.get(i).setImage(((Bot) piece).getDeadImage());
-            } else if (piece instanceof Bomb) {
-                imageViews.get(i).setImage(((Bomb) piece).getExplorationImage());
+    public void explore(Piece[] deadPieces) {
+        int xx = deadPieces[0].getCoordinatesX();
+        int yy = deadPieces[0].getCoordinatesY();
+        int len = deadPieces.length;
+        explosionSound.play();
+        for (int i = 0; i < len; i++) {
+            Piece piece = deadPieces[i];
+            if (piece == null) {
+                int finalI = i;
+                Platform.runLater(() -> {
+                    double lx = xx, ly = yy;
+                    switch (finalI) {
+                        case (1) -> ly -= 1;
+                        case (2) -> lx += 1;
+                        case (3) -> ly += 1;
+                        case (4) -> lx -= 1;
+                        case (5) -> ly -= 2;
+                        case (6) -> lx += 2;
+                        case (7) -> ly += 2;
+                        case (8) -> lx -= 2;
+                    }
+                    ImageView iv = new ImageView(new Image(
+                            new File("src/main/resources/com/uet/oop/Images/BombExplores/0.gif").toURI().toString()
+                    ));
+                    iv.setFitWidth(SIZE);
+                    iv.setFitHeight(SIZE);
+                    iv.setPreserveRatio(true);
+                    iv.setLayoutX(lx * SIZE);
+                    iv.setLayoutY(ly * SIZE);
+                    pane.getChildren().add(iv);
+                    animated(iv, lx * SIZE, lx * SIZE, ly * SIZE, ly * SIZE, 0.5, null);
+                });
+            } else {
+                ImageVision imgvis = null;
+                if (piece instanceof Stone) {
+                    if (i <= 4) deadPieces[i + 4] = new Stone();
+                    continue;
+                }
+                for (ImageVision iv : imageVisions) {
+                    if (iv.getPiece().equals(piece)) imgvis = iv;
+                }
+                assert imgvis != null;
+                double x = imgvis.getImageView().getLayoutX();
+                double y = imgvis.getImageView().getLayoutY();
+                Image img = null;
+                Bonus bonus = imgvis.getContainedBonus();
+                if (bonus != null) {
+                    img = bonus.getStandingImage();
+                    Image img2 = imgvis.getExplosionImage();
+                    imgvis.setPiece(bonus, img2);
+                    imgvis.getImageView().setVisible(true);
+                } else {
+                    imgvis.setOnExplosion();
+                    imgvis.stop();
+                }
+                animated(imgvis.getImageView(), x, x, y, y, 0.5, img);
             }
         }
-        sleep(100);
-        Image img = new Bomb().getExplorationImage();
-        for (int i : index) {
-            imageViews.get(i).setImage(img);
-        }
-        sleep(100);
-        for (int i : index) {
-            imageViews.remove(i);
-//            pane.getChildren().remove(i);
-        }
-    }
 
-    private void sleep(int interval) {
-        try {
-            Thread.sleep(interval);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (bomberman.isInExplosionRangeOf((Bomb) deadPieces[0])) {
+            if (bomberman.getHealthPoint() > 1) {
+                Image img = bombermanImgVision.getStandingImage();
+                bombermanImgVision.getImageView().setImage(((Bomb) deadPieces[0]).getExplorsionImage());
+                animated(bombermanImgVision.getImageView(), bombermanImgVision.getLayoutX(), bombermanImgVision.getLayoutX(),
+                        bombermanImgVision.getLayoutY(), bombermanImgVision.getLayoutY(), 0.5, img);
+            }
         }
     }
 
     public void moveBomberman(int direction) {
         // 0 -> left; 1 -> right; 2 -> up; 3 -> down
-        bombermanImgView.setImage(bomberman.getMovingImage(direction));
-        if (!bomberman.canMove(game.getBoard(), direction)) {
-            bombermanImgView.setImage(bomberman.getStandingImage(direction));
-        } else {
-            double x = bombermanImgView.getLayoutX();
-            double y = bombermanImgView.getLayoutY();
-            switch (direction) {
-                case (0) -> {
-                    bombermanImgView.setLayoutX(x - 10);
-                    bombermanImgView.setLayoutX(x - 20);
-                    bombermanImgView.setLayoutX(x - 30);
-                }
-                case (1) -> {
-                    bombermanImgView.setLayoutX(x + 10);
-                    bombermanImgView.setLayoutX(x + 20);
-                    bombermanImgView.setLayoutX(x + 30);
-                }
-                case (2) -> {
-                    bombermanImgView.setLayoutY(y - 10);
-                    bombermanImgView.setLayoutY(y - 20);
-                    bombermanImgView.setLayoutY(y - 30);
-                }
-                case (3) -> {
-                    bombermanImgView.setLayoutY(y + 10);
-                    bombermanImgView.setLayoutY(y + 20);
-                    bombermanImgView.setLayoutY(y + 30);
-                }
-            }
-        }
+        if (!bomberman.ableToMove()) return;
+        boolean canMove = bomberman.canMove(game.getBoard(), direction);
         game.movePiece(bomberman, direction);
+        if (canMove) {
+            bombermanImgVision.setOnMoving();
+            double fx = bombermanImgVision.getLayoutX();
+            double fy = bombermanImgVision.getLayoutY();
+            double tx = bomberman.getCoordinatesX() * SIZE;
+            double ty = bomberman.getCoordinatesY() * SIZE;
+            animated(bombermanImgVision.getImageView(), fx, tx, fy, ty,
+                    Bomberman.DURATION, bomberman.getStandingImage());
+        } else {
+            bombermanImgVision.setOnStanding();
+        }
     }
 
     public void bombermanDie() {
-        bombermanImgView.setImage(bomberman.getExploringImage());
-        //
+        defeatSound.play();
+        bombermanImgVision.setOnExplosion();
+        animated(bombermanImgVision.getImageView(), bombermanImgVision.getLayoutX(), bombermanImgVision.getLayoutX(),
+                bombermanImgVision.getLayoutY(), bombermanImgVision.getLayoutY(), Bomberman.DURATION, null);
     }
 
     public void moveBot(Bot bot, int direction) {
+        if (!bot.ableToMove()) return;
         if (!bot.canMove(game.getBoard(), direction)) return;
-        ImageView imgview = imageViews.get(game.getBoard().getPieces().indexOf(bot));
-        double x = imgview.getLayoutX();
-        double y = imgview.getLayoutY();
-        switch (direction) {
-            case (0) -> {
-                imgview.setLayoutX(x - 10);
-                imgview.setLayoutX(x - 20);
-                imgview.setLayoutX(x - 30);
-            }
-            case (1) -> {
-                imgview.setLayoutX(x + 10);
-                imgview.setLayoutX(x + 20);
-                imgview.setLayoutX(x + 30);
-            }
-            case (2) -> {
-                imgview.setLayoutY(y - 10);
-                imgview.setLayoutY(y - 20);
-                imgview.setLayoutY(y - 30);
-            }
-            case (3) -> {
-                imgview.setLayoutY(y + 10);
-                imgview.setLayoutY(y + 20);
-                imgview.setLayoutY(y + 30);
-            }
+        ImageVision imgvis = null;
+        for (ImageVision iv : imageVisions) {
+            if (iv.isAlive() && iv.getPiece().equals(bot)) imgvis = iv;
         }
+        assert imgvis != null;
+        double fx = imgvis.getImageView().getLayoutX();
+        double fy = imgvis.getImageView().getLayoutY();
+        game.movePiece(bot, direction);
+        double tx = bot.getCoordinatesX() * SIZE;
+        double ty = bot.getCoordinatesY() * SIZE;
+        Image img = imgvis.getMoveImage();
+        double duration = bot.getDuraionAtLevel();
+        if (!imgvis.isAlive()) img = null;
+        animated(imgvis.getImageView(), fx, tx, fy, ty, duration, img);
+    }
+
+    private void animated(ImageView imgview, double fx, double tx, double fy, double ty, double interval, Image img) {
+        TranslateTransition animation = new TranslateTransition(
+                Duration.seconds(interval), imgview
+        );
+        animation.setCycleCount(1);
+        if (fx != tx) {
+            animation.setFromX(0);
+            animation.setToX(tx - fx);
+        }
+        if (fy != ty) {
+            animation.setFromY(0);
+            animation.setToY(ty - fy);
+        }
+        animation.setOnFinished(actionEvent -> {
+            imgview.setLayoutX(tx);
+            imgview.setLayoutY(ty);
+            imgview.setTranslateY(0);
+            imgview.setTranslateX(0);
+            if (img == null) imgview.setVisible(false);
+            else imgview.setImage(img);
+        });
+        animation.play();
+    }
+
+    public void fade() {
+        FadeTransition fade = new FadeTransition(
+                Duration.seconds(Bomberman.STUNNED_TIME / 6), bombermanImgVision.getImageView()
+        );
+        fade.setFromValue(1.0);
+        fade.setToValue(0.3);
+        fade.setAutoReverse(true);
+        fade.setCycleCount(6);
+        fade.play();
+    }
+
+    public void claimBonus(Bonus b) {
+        bonusSound.play();
+        System.out.println("claim bonus");
+        game.getBoard().getPieces().remove(b);
+        imageVisions.forEach(iv -> {
+            if (iv.isAlive() && iv.getPiece().equals(b)) {
+                animated(iv.getImageView(), iv.getLayoutX(), iv.getLayoutX(),
+                        iv.getLayoutY(), iv.getLayoutY(), 0.1, null);
+                iv.stop();
+            }
+        });
+    }
+
+    public void showGameSettings() {
+        new GamesSettingsController().show(this);
+    }
+
+    public void musicOn() {
+        battleMusic.play();
+    }
+
+    public void setRemainingTime(long time) {
+        int m = ((int) time) / 60;
+        int s = ((int) time) % 60;
+        System.out.println(time + " " + m + " " + s);
+        if (System.currentTimeMillis() - lastTime < 1e3) return;
+        lastTime = System.currentTimeMillis();
+        Platform.runLater(() -> {
+            minutesLabel.setText(String.valueOf(m));
+            secondsLabel.setText(String.valueOf(s));
+            if (m == 0 && s <= 3) {
+                minutesLabel.setTextFill(Color.RED);
+                secondsLabel.setTextFill(Color.RED);
+                clockSound.play();
+                clockSound.setVolume(soundVolume);
+            } else {
+                minutesLabel.setTextFill(Color.LIMEGREEN);
+                secondsLabel.setTextFill(Color.LIMEGREEN);
+                clockSound.pause();
+            }
+        });
+    }
+
+    public void setLoadingDone() {
+        loadingview.setVisible(false);
+        loadingMusic.stop();
+        battleMusic.play();
+    }
+
+    public void setVolume(double mv, double sv) {
+        musicVolume = mv;
+        battleMusic.setVolume(musicVolume);
+        soundVolume = sv;
+        explosionSound.setVolume(soundVolume);
+        bonusSound.setVolume(soundVolume);
+        clockSound.setVolume(soundVolume);
+        loadingMusic.setVolume(musicVolume);
+    }
+
+    public void setEnding(boolean win) {
+        System.out.println("ending");
+        battleMusic.stop();
+        Platform.runLater(() -> {
+            try {
+                Pane pane = new Pane();
+                pane.setPrefSize(720, 540);
+
+                ImageView imgview = new ImageView();
+                imgview.setFitWidth(720);
+                imgview.setFitHeight(540);
+                imgview.setPreserveRatio(false);
+                if (win)
+                    imgview.setImage(new Image(
+                            new File("src/main/resources/com/uet/oop/Images/Background/victory.gif").toURI().toString()));
+                else
+                    imgview.setImage(new Image(
+                            new File("src/main/resources/com/uet/oop/Images/Background/defeat.gif").toURI().toString()));
+                endingMusic.play();
+
+                pane.getChildren().add(imgview);
+                Scene scene = new Scene(pane, 720, 540);
+                scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+                    System.out.println(keyEvent.getCode());
+                    endingMusic.stop();
+                    new HomeController().show();
+                });
+                Stage stage = BombermanGame.mainStage;
+                stage.setScene(scene);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        });
     }
 }

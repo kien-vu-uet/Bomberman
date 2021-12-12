@@ -6,7 +6,9 @@ import java.io.File;
 
 public class Bomb extends Piece {
     public static final int RADIUS = 2;
+    public static final double EXISTED_TIME = 3;//seconds
     private long startTime;
+    private boolean countingStarted = false;
     private Image bombImage;
     private Image explorationImage;
 
@@ -23,7 +25,7 @@ public class Bomb extends Piece {
         return bombImage;
     }
 
-    public Image getExplorationImage() {
+    public Image getExplorsionImage() {
         return explorationImage;
     }
 
@@ -37,11 +39,12 @@ public class Bomb extends Piece {
     }
 
     public void startCountingDown() {
+        countingStarted = true;
         this.startTime = System.nanoTime();
     }
 
-    public boolean isTimingUp() {
-        return (System.nanoTime() - startTime == 3e9);
+    public boolean isTimedOut() {
+        return (countingStarted && System.nanoTime() - startTime >= (EXISTED_TIME * 1e9));
     }
 
     @Override
