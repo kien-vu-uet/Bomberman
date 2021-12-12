@@ -4,9 +4,9 @@ import com.uet.oop.BombermanGame;
 import com.uet.oop.Entities.*;
 import com.uet.oop.ProcessingUnits.MusicPlayer;
 import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,6 +17,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -107,7 +108,7 @@ public class GameController {
 
         minutesLabel = new Label();
         minutesLabel.setFont(Font.font("Snap ITC", 36));
-        minutesLabel.setLayoutX(20);
+        minutesLabel.setLayoutX(30);
         minutesLabel.setLayoutY(180);
 
         secondsLabel = new Label();
@@ -149,10 +150,6 @@ public class GameController {
 
         Stage stage = BombermanGame.mainStage;
         stage.setScene(playingScene);
-        stage.setOnCloseRequest(windowEvent -> {
-            game.stop();
-            stage.close();
-        });
         stage.show();
     }
 
@@ -339,7 +336,6 @@ public class GameController {
     public void setRemainingTime(long time) {
         int m = ((int) time) / 60;
         int s = ((int) time) % 60;
-        System.out.println(time + " " + m + " " + s);
         if (System.currentTimeMillis() - lastTime < 1e3) return;
         lastTime = System.currentTimeMillis();
         Platform.runLater(() -> {

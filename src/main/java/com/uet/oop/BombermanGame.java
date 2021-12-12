@@ -12,7 +12,13 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
+import java.util.Scanner;
 
 public class BombermanGame extends Application {
     public static Stage mainStage;
@@ -46,9 +52,31 @@ public class BombermanGame extends Application {
             alert.setContentText("Continue");
             Optional<ButtonType> action = alert.showAndWait();
             if (action.isPresent() && action.get() == ButtonType.OK) {
-                BombermanGame.mainStage.close();
                 musicPlayer.stop();
-                mainStage.close();
+                BombermanGame.mainStage.close();
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                try {
+                    File file = new File("src/main/resources/com/uet/oop/PlayerRecord/PlayerRecords");
+                    Scanner sc = new Scanner(file);
+                    StringBuilder recs = new StringBuilder();
+                    while (sc.hasNextLine()) {
+                        recs.append(sc.nextLine()).append("\n");
+                    }
+                    recs.append(dateFormat.format(date)).append(": Level passed ").append(HomeController.HIGHEST_LEVEL);
+                    sc.close();
+
+                    FileWriter fw = new FileWriter(file);
+                    fw.write(recs.toString());
+                    fw.close();
+
+                    File f = new File("src/main/resources/com/uet/oop/PlayerRecord/Level.txt");
+                    FileWriter fw2 = new FileWriter(f);
+                    fw2.append(String.valueOf(HomeController.HIGHEST_LEVEL));
+                    fw2.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 System.exit(0);
             }
         });
@@ -57,6 +85,14 @@ public class BombermanGame extends Application {
     @FXML
     private void playButtonOnClicked() {
         musicPlayer.stop();
+        try {
+            Scanner sc = new Scanner(new File("src/main/resources/com/uet/oop/PlayerRecord/Level.txt"));
+            HomeController.HIGHEST_LEVEL = sc.nextInt();
+            System.out.println(HomeController.HIGHEST_LEVEL);
+            sc.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         new HomeController().show();
     }
 

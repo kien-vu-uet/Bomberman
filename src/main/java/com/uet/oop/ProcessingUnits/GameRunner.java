@@ -5,16 +5,17 @@ import com.uet.oop.Entities.Bonus;
 import com.uet.oop.Entities.Bot;
 import com.uet.oop.Entities.Piece;
 import com.uet.oop.GraphicsControllers.GameController;
+import com.uet.oop.GraphicsControllers.HomeController;
 
 
 import java.util.List;
 import java.util.Random;
 
-public class RunningGame implements Runnable {
+public class GameRunner implements Runnable {
     private Thread thread;
     private GameController gc;
 
-    public RunningGame(GameController gc) {
+    public GameRunner(GameController gc) {
         thread = new Thread(this, "RUNNING_GAME");
         thread.setDaemon(true);
         this.gc = gc;
@@ -24,8 +25,7 @@ public class RunningGame implements Runnable {
     public void run() {
         gc.setLoadingDone();
         gc.game.run();
-        long waitingTime;
-        while (gc.bomberman.isAlive() && gc.game.isRunning()) {
+        while (gc.bomberman.isAlive() || gc.game.isRunning()) { // fix
             if (gc.game.isPaused()) continue;
             gc.setRemainingTime(gc.game.getRemainingTime());
             // bombs explore
@@ -65,7 +65,10 @@ public class RunningGame implements Runnable {
                 });
             } else gc.game.setStatus(1);
         }
-        if (gc.game.getEndingStatus() == 1) gc.setEnding(true);
+        if (gc.game.getEndingStatus() == 1) {
+            if (HomeController.SELECTED_LEVEL > HomeController.HIGHEST_LEVEL) HomeController.HIGHEST_LEVEL++;
+            gc.setEnding(true);
+        }
         else if (gc.game.getEndingStatus() == 0) gc.setEnding(false);
     }
 

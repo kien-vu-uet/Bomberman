@@ -11,10 +11,10 @@
    <children>
       <ImageView fx:id="map" fitHeight="300.0" fitWidth="300.0" layoutX="374.0" layoutY="107.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../../../../../../bomberman-starter/res/demo.png" />
+            <Image url="@../Images/Maps/map1.png" />
          </image>
       </ImageView>
-      <Label layoutX="496.0" layoutY="427.0" text="Map" textFill="#7289b7">
+      <Label fx:id="status" layoutX="486.0" layoutY="427.0" text="Unlock" textFill="GREEN">
          <font>
             <Font name="Snap ITC" size="24.0" />
          </font>
@@ -31,7 +31,7 @@
       </ImageView>
       <ImageView fx:id="bomberman" fitHeight="75.0" fitWidth="166.0" layoutX="150.0" layoutY="247.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../Images/Bomberman/Yellow/33.gif" />
+            <Image url="@../Images/Background/1.gif" />
          </image>
       </ImageView>
       <ImageView fitHeight="32.0" fitWidth="37.0" layoutX="82.0" layoutY="272.0" onMouseClicked="#previousBomberman" pickOnBounds="true" preserveRatio="true">

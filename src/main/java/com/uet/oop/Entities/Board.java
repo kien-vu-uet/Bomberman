@@ -9,12 +9,11 @@ import java.util.Scanner;
 
 public class Board {
     private static List<Piece> pieces;
-    public static int length;
+    public static final int SIZE = 18;
     private int playingTime;
 
     public Board() {
         pieces = new ArrayList<>();
-        length = 0;
     }
 
     void readBoard(String path) {
@@ -23,10 +22,9 @@ public class Board {
             if (!file.exists()) System.err.println("File not found");
             Scanner sc = new Scanner(file);
             playingTime = sc.nextInt();
-            length = sc.nextInt();
-            System.out.println(playingTime + "\n" + length);
+            System.out.println(playingTime + "\n" + SIZE);
             sc.nextLine();
-            for (int j = 0; j < length && sc.hasNextLine(); j++) {
+            for (int j = 0; j < SIZE && sc.hasNextLine(); j++) {
                 String s = sc.nextLine();
                 for (int i = 0; i < s.length(); i++) {
                     if (s.charAt(i) == '#') {
@@ -97,13 +95,13 @@ public class Board {
     public String toString() {
         StringBuilder res = new StringBuilder();
         res.append("\n");
-        String[][] board = new String[length][length];
+        String[][] board = new String[SIZE][SIZE];
         for (Piece piece : pieces) {
             if (piece instanceof Bot) continue;
             board[piece.getCoordinatesY()][piece.getCoordinatesX()] = piece.getSymbol();
         }
-        for (int j = 0; j < length; j++) {
-            for (int i = 0; i < length; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
                 if (board[j][i] == null) res.append(" ");
                 else res.append(board[j][i]);
             }

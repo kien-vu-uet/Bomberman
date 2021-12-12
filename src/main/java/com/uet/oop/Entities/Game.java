@@ -39,7 +39,6 @@ public class Game {
     public long getRemainingTime() {
         double playedTime = (System.currentTimeMillis() - startTime - penalty) / 1e3;
         long rt = (long) ((long) board.getPlayingTime() - playedTime);
-        System.out.println(board.getPlayingTime() + " " + playedTime + " " + rt);
         return rt;
     }
 
@@ -78,7 +77,7 @@ public class Game {
     }
 
     public boolean validate(int x, int y) {
-        return (x >= 1 && x < Board.length - 1 && y >= 1 && y < Board.length - 1);
+        return (x >= 1 && x < Board.SIZE - 1 && y >= 1 && y < Board.SIZE - 1);
     }
 
     public void movePiece(Piece piece, int direction) {
