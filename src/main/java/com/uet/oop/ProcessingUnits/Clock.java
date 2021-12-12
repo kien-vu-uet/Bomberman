@@ -58,7 +58,7 @@ public class Clock implements Runnable {
         } catch (InterruptedException e) {
             System.err.println(e.getMessage());
         }
-        game.exploreAt(bomb.getCoordinatesX(), bomb.getCoordinatesY());
+//        game.explore(bomb.getCoordinatesX(), bomb.getCoordinatesY());
         interval = 0;
         timeUp = true;
     }

@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class Board {
     private static List<Piece> pieces;
     public static int length;
+    private int playingTime;
 
     public Board() {
         pieces = new ArrayList<>();
@@ -21,18 +22,20 @@ public class Board {
             File file = new File(path);
             if (!file.exists()) System.err.println("File not found");
             Scanner sc = new Scanner(file);
+            playingTime = sc.nextInt();
             length = sc.nextInt();
+            System.out.println(playingTime + "\n" + length);
             sc.nextLine();
             for (int j = 0; j < length && sc.hasNextLine(); j++) {
                 String s = sc.nextLine();
                 for (int i = 0; i < s.length(); i++) {
-                    if (s.charAt(j) == '#') {
+                    if (s.charAt(i) == '#') {
                         pieces.add(new Stone(i, j));
-                    } else if (s.charAt(j) == '=') {
+                    } else if (s.charAt(i) == '=') {
                         pieces.add(new Brick(i, j));
-                    } else if (s.charAt(j) == '!') {
-                        pieces.add(new Bot(i, j, new Random().nextInt(5)));
-                    } else if (s.charAt(j) == '$') {
+                    } else if (s.charAt(i) == '!') {
+                        pieces.add(new Bot(i, j, new Random().nextInt(5) + 1));
+                    } else if (s.charAt(i) == '$') {
                         pieces.add(new Bomberman(i, j));
                     }
                 }
@@ -41,6 +44,14 @@ public class Board {
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    public void setPlayingTime(int time) {
+        playingTime += time;
+    }
+
+    public double getPlayingTime() {
+        return this.playingTime;
     }
 
     public Piece getAt(int x, int y) {
@@ -53,11 +64,6 @@ public class Board {
         return null;
     }
 
-    public void removeAt(int x, int y) {
-        Piece piece = getAt(x, y);
-        pieces.remove(piece);
-    }
-
     public List<Piece> getPieces() {
         return pieces;
     }
@@ -65,6 +71,22 @@ public class Board {
     public void add(Piece piece) {
         if (piece == null) return;
         pieces.add(piece);
+    }
+
+    public List<Piece> getAllAt(int x, int y) {
+        List<Piece> res = new ArrayList<>();
+        Piece piece;
+        for (int i = 0; i < pieces.size(); i++) {
+            if ((piece = pieces.get(i)) != null && piece.checkPosition(x, y)) res.add(piece);
+        }
+        return res;
+    }
+
+    public void remove(Piece piece) {
+        if (piece instanceof Bomberman) return;
+        if (piece instanceof Bot b1) pieces.add(b1.getContainedBonus());
+        else if (piece instanceof Brick b2) pieces.add(b2.getContainedBonus());
+        pieces.remove(piece);
     }
 
     public void print() {
@@ -78,12 +100,12 @@ public class Board {
         String[][] board = new String[length][length];
         for (Piece piece : pieces) {
             if (piece instanceof Bot) continue;
-            board[piece.getCoordinatesX()][piece.getCoordinatesY()] = piece.getSymbol();
+            board[piece.getCoordinatesY()][piece.getCoordinatesX()] = piece.getSymbol();
         }
-        for (int i = 0; i < length; i++) {
-            for (int j = 0; j < length; j++) {
-                if (board[i][j] == null) res.append(" ");
-                else res.append(board[i][j]);
+        for (int j = 0; j < length; j++) {
+            for (int i = 0; i < length; i++) {
+                if (board[j][i] == null) res.append(" ");
+                else res.append(board[j][i]);
             }
             res.append("\n");
         }
@@ -92,7 +114,8 @@ public class Board {
 
     public List<Bot> getBots() {
         List<Bot> bots = new ArrayList<>();
-        for (Piece piece : pieces) {
+        for (int i = 0; i < pieces.size(); i++) {
+            Piece piece = pieces.get(i);
             if (piece instanceof Bot) {
                 bots.add((Bot) piece);
             }
@@ -100,19 +123,19 @@ public class Board {
         return bots;
     }
 
-    public List<Bomberman> getBombermans() {
-        List<Bomberman> bombermans = new ArrayList<>();
+    public Bomberman getBomberman() {
         for (Piece piece : pieces) {
             if (piece instanceof Bomberman) {
-                bombermans.add((Bomberman) piece);
+                return (Bomberman) piece;
             }
         }
-        return bombermans;
+        return null;
     }
 
     public List<Bomb> getBombs() {
         List<Bomb> bombs = new ArrayList<>();
-        for (Piece piece : pieces) {
+        for (int i = 0; i < pieces.size(); i++) {
+            Piece piece = pieces.get(i);
             if (piece instanceof Bomb) {
                 bombs.add((Bomb) piece);
             }

@@ -1,7 +1,11 @@
 package com.uet.oop.ProcessingUnits;
 
-import com.uet.oop.Entities.*;
+import com.uet.oop.Entities.Bomb;
+import com.uet.oop.Entities.Bonus;
+import com.uet.oop.Entities.Bot;
+import com.uet.oop.Entities.Piece;
 import com.uet.oop.GraphicsControllers.GameController;
+
 
 import java.util.List;
 import java.util.Random;
@@ -9,44 +13,60 @@ import java.util.Random;
 public class RunningGame implements Runnable {
     private Thread thread;
     private GameController gc;
-    private Game game;
-    private Bomberman bomberman;
 
-    public RunningGame(Game game, GameController gc, Bomberman bomberman) {
+    public RunningGame(GameController gc) {
         thread = new Thread(this, "RUNNING_GAME");
-        this.bomberman = bomberman;
-        this.game = game;
+        thread.setDaemon(true);
         this.gc = gc;
     }
 
     @Override
     public void run() {
-        while (bomberman.isAlive()) {
+        gc.setLoadingDone();
+        gc.game.run();
+        long waitingTime;
+        while (gc.bomberman.isAlive() && gc.game.isRunning()) {
+            if (gc.game.isPaused()) continue;
+            gc.setRemainingTime(gc.game.getRemainingTime());
             // bombs explore
-            List<Bomb> bombs = game.getBoard().getBombs();
-            for (Bomb bomb : bombs) {
-                if (bomb.isTimingUp()) {
-                    List<Piece> deadPieces = game.getPiecesInRange(bomb.getCoordinatesX(), bomb.getCoordinatesY());
-                    gc.explore(deadPieces);
-                    game.exploreAt(bomb.getCoordinatesX(), bomb.getCoordinatesY());
-                    if (!bomberman.isAlive()) gc.bombermanDie();
-                }
+            List<Bomb> bombs = gc.game.getBoard().getBombs();
+            if (!bombs.isEmpty()) {
+                bombs.stream().filter(Bomb::isTimedOut).forEach(bomb -> {
+                    gc.explore(gc.game.explore(bomb));
+                });
             }
-            //
-            if (game.getBoard().getAt(bomberman.getCoordinatesX(), bomberman.getCoordinatesY()) instanceof Bot) {
-                bomberman.bleed();
+            // check
+            List<Piece> pieces = gc.game.getBoard().getAllAt(gc.bomberman.getCoordinatesX(), gc.bomberman.getCoordinatesY());
+            if (!pieces.isEmpty() && !gc.bomberman.isStunned()) {
+                pieces.forEach(p -> {
+                    if (p instanceof Bot) gc.bomberman.bleed();
+                    else if (p instanceof Bonus b) {
+                        switch (b.getType()) {
+                            case (0) -> gc.bomberman.equipBomb();
+                            case (1) -> gc.bomberman.heal();
+                            case (2) -> gc.game.bonusTime();
+                        }
+                        gc.claimBonus(b);
+                    }
+                });
+            }
+            if (!gc.bomberman.isAlive()) {
                 gc.bombermanDie();
-            }
+                gc.game.setStatus(0);
+                continue;
+            } else if (gc.bomberman.isStunned()) gc.fade();
+            gc.bomberman.restoreBomb();
             // bots move
-            List<Bot> bots = game.getBoard().getBots();
             Random random = new Random();
-            for (Bot bot : bots) {
-                if (random.nextInt(2) == 1) continue;
-                int direction = random.nextInt(4) % 4;
-                gc.moveBot(bot, direction);
-                game.movePiece(bot, direction);
-            }
+            if (!gc.bots.isEmpty()) {
+                gc.bots.forEach(bot -> {
+                    int direction = random.nextInt(4) % 4;
+                    gc.moveBot(bot, direction);
+                });
+            } else gc.game.setStatus(1);
         }
+        if (gc.game.getEndingStatus() == 1) gc.setEnding(true);
+        else if (gc.game.getEndingStatus() == 0) gc.setEnding(false);
     }
 
     public void start() {

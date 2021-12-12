@@ -25,15 +25,20 @@ public class HomeController {
     @FXML private Slider soundSlider;
     @FXML private ImageView musicIcon;
     @FXML private ImageView soundIcon;
-    @FXML private ImageView loading;
 
-    private List<Image> bombermanImage;
+    private static final List<Image> bombermanImage = new ArrayList<>(Arrays.asList(
+            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Yellow/33.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Blue/33.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Green/33.gif").toURI().toString()),
+            new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Red/33.gif").toURI().toString())
+    ));
     private int imageIndex = 0;
-    private MusicPlayer musicPlayer;
-    private MusicPlayer selectSound;
-    private MusicPlayer moveSound;
+    private static final MusicPlayer musicPlayer = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Select.mp3", true);
+    private static final MusicPlayer selectSound = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Select.wav", false);
     private List<ImageView> images;
     private int mapIndex = 0;
+    public static double musicVolume = 1;
+    public static double soundVolume = 1;
 
     @FXML
     private void previousMap() {
@@ -61,45 +66,40 @@ public class HomeController {
     private void nextBomberman() {
         selectSound.play();
         imageIndex++;
+        imageIndex = imageIndex % 4;
         bomberman.setImage(bombermanImage.get(imageIndex));
     }
 
     @FXML
     private void playGame() {
+        musicVolume = musicPlayer.getVolume();
+        soundVolume = selectSound.getVolume();
+
         selectSound.play();
-        for (double i = musicPlayer.getVolume(); i > 0; i -= 0.1) {
-            musicPlayer.setVolume(i);
-        }
         musicPlayer.stop();
         selectSound.stop();
-        moveSound.stop();
 
         Game game = new Game();
-        game.initialize("src/main/resources/com/uet/oop/Maps/map1.txt");
-        Bomberman bomberman = (Bomberman) game.getBoard().getAt(1, 1);
-        GameController gc = new GameController(game, bomberman);
-        RunningGame rg = new RunningGame(game, gc, bomberman);
-        gc.show(musicSlider.getValue(), soundSlider.getValue());
+        game.initialize("src/main/resources/com/uet/oop/Maps/map2.txt");
+        Bomberman bomberman = game.getBoard().getBomberman();
+        switch(imageIndex) {
+            case (0) -> bomberman.setColor("Yellow");
+            case (1) -> bomberman.setColor("Blue");
+            case (2) -> bomberman.setColor("Green");
+            case (3) -> bomberman.setColor("Red");
+        }
+        GameController gc = new GameController();
+        RunningGame rg = new RunningGame(gc);
+        gc.show(game, bomberman);
         rg.start();
     }
 
     @FXML
     private void quitGame() {
         selectSound.play();
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Bomberman Go");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(new File("src/main/resources/com/uet/oop/Images/Background/Icon.png").toURI().toString()));
-        alert.setHeaderText("Quit game?");
-        alert.setContentText("Continue");
-        Optional<ButtonType> action = alert.showAndWait();
-        if (action.isPresent() && action.get() == ButtonType.OK) {
-            BombermanGame.mainStage.close();
-            musicPlayer.stop();
-            selectSound.stop();
-            moveSound.stop();
-            new BombermanGame().start(BombermanGame.mainStage);
-        }
+        musicPlayer.stop();
+        selectSound.stop();
+        new BombermanGame().start(BombermanGame.mainStage);
     }
 
     @FXML
@@ -111,8 +111,8 @@ public class HomeController {
             musicPlayer.setVolume(0);
         } else {
             musicIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/music.png").toURI().toString()));
-            musicSlider.setValue(1);
-            musicPlayer.setVolume(1);
+            musicSlider.setValue(musicVolume);
+            musicPlayer.setVolume(musicVolume);
         }
     }
 
@@ -123,12 +123,10 @@ public class HomeController {
             soundIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/muteSound.png").toURI().toString()));
             soundSlider.setValue(0);
             selectSound.setVolume(0);
-            moveSound.setVolume(0);
         } else {
             soundIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/sound.png").toURI().toString()));
-            soundSlider.setValue(1);
-            selectSound.setVolume(1);
-            moveSound.setVolume(1);
+            soundSlider.setValue(soundVolume);
+            selectSound.setVolume(soundVolume);
         }
     }
 
@@ -142,6 +140,7 @@ public class HomeController {
         } else {
             musicIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/music.png").toURI().toString()));
             musicPlayer.setVolume(value);
+            musicVolume = value;
         }
     }
 
@@ -152,36 +151,21 @@ public class HomeController {
         if (value == 0) {
             soundIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/muteSound.png").toURI().toString()));
             selectSound.setVolume(0);
-            moveSound.setVolume(0);
         } else {
             soundIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/sound.png").toURI().toString()));
             selectSound.setVolume(value);
-            moveSound.setVolume(value);
+            soundVolume = value;
         }
     }
 
-    @FXML
-    private void onMouseMoved() {
-        moveSound.play();
-    }
-
     public void show() {
-        musicPlayer = new MusicPlayer("src/main/resources/com/uet/oop/Musics/Select.mp3", true);
         musicPlayer.play();
-        selectSound = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Select.wav", false);
-        moveSound = new MusicPlayer("src/main/resources/com/uet/oop/Sounds/Move.wav", false);
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(BombermanGame.class.getResource("FXML/Home.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 720, 540);
             Stage stage = BombermanGame.mainStage;
             stage.setScene(scene);
             stage.show();
-            bombermanImage = new ArrayList<>();
-            bombermanImage.add(new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Yellow/33.gif").toURI().toString()));
-            bombermanImage.add(new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Blue/33.gif").toURI().toString()));
-            bombermanImage.add(new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Green/33.gif").toURI().toString()));
-            bombermanImage.add(new Image(new File("src/main/resources/com/uet/oop/Images/Bomberman/Red/33.gif").toURI().toString()));
-//            loading.setVisible(false);
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }

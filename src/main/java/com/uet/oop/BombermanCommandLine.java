@@ -1,18 +1,11 @@
 package com.uet.oop;
 
-import com.uet.oop.Entities.Bot;
 import com.uet.oop.Entities.Game;
-import com.uet.oop.Entities.Piece;
-import com.uet.oop.ProcessingUnits.AutomaticBot;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class BombermanCommandLine {
     public static boolean signal = false;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Game game = new Game();
         game.initialize("src/main/resources/com/uet/oop/maps/map1.txt");
         game.getBoard().print();

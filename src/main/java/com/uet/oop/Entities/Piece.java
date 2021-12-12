@@ -1,18 +1,23 @@
 package com.uet.oop.Entities;
 
 public abstract class Piece {
-    public static final int P_WIDTH = 20;
-    public static final int P_HEIGHT = 20;
+    private static int AUTO_INCREMENT_INDEX = 0;
     private int coordinatesX;
     private int coordinatesY;
+    private int index;
 
     public Piece() {
-
+        index = ++AUTO_INCREMENT_INDEX;
     }
 
     public Piece(int coordinatesX, int coordinatesY) {
         this.coordinatesX = coordinatesX;
         this.coordinatesY = coordinatesY;
+        index = ++AUTO_INCREMENT_INDEX;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public int getCoordinatesX() {
@@ -55,6 +60,6 @@ public abstract class Piece {
 
     public boolean equals(Object object) {
         if (!(object instanceof Piece other)) return false;
-        return checkPosition(other.getCoordinatesX(), other.getCoordinatesY());
+        return other.getIndex() == index;
     }
 }

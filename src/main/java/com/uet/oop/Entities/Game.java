@@ -1,13 +1,75 @@
 package com.uet.oop.Entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Game {
     private static Board board;
+    private boolean isRunning;
+    private boolean isPaused;
+    private long startTime;
+    private int endingStatus;
+    private long pausedTime;
+    private double penalty = 0;
 
     public Game() {
 
+    }
+
+    public void setStatus(int stt) {
+        endingStatus = stt;
+        if (stt == 1) isRunning = false;
+    }
+
+    public int getEndingStatus() {
+        return endingStatus;
+    }
+
+    public boolean isRunning() {
+        isRunning = (!isTimedOut() && isRunning);
+        return isRunning;
+    }
+
+    public void run() {
+        startTime = System.currentTimeMillis();
+        isRunning = true;
+    }
+
+    /**
+     * get remaining time of the match
+     * @return time.seconds;
+     */
+    public long getRemainingTime() {
+        double playedTime = (System.currentTimeMillis() - startTime - penalty) / 1e3;
+        long rt = (long) ((long) board.getPlayingTime() - playedTime);
+        System.out.println(board.getPlayingTime() + " " + playedTime + " " + rt);
+        return rt;
+    }
+
+    public boolean isTimedOut() {
+        return (System.currentTimeMillis() - startTime - penalty) >= (board.getPlayingTime() * 1e3);
+    }
+
+    public void stop() {
+        endingStatus = -1;
+        isRunning = false;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public void pause() {
+        if (!isRunning) return;
+        isPaused = true;
+        pausedTime = System.currentTimeMillis();
+    }
+
+    public void resume() {
+        if (!isRunning) return;
+        isPaused = false;
+        penalty += (System.currentTimeMillis() - pausedTime) / 1e3;
+    }
+
+    public void bonusTime() {
+        board.setPlayingTime(Bonus.TIME_BONUS);
     }
 
     public void initialize(String boardFile) {
@@ -40,47 +102,42 @@ public class Game {
         return bomb;
     }
 
-    public void exploreAt(int x, int y) {
-        for (Piece piece : getPiecesInRange(x, y)) {
-            if (piece instanceof Bomberman bomberman) {
-                bomberman.bleed();
-                if (bomberman.isAlive()) continue;
-            }
-            board.getPieces().remove(piece);
-        }
-    }
+    public Piece[] explore(Bomb bomb) {
+        Piece[] res = new Piece[9];
 
-    public List<Piece> getPiecesInRange(int x, int y) {
-        if (!validate(x, y)) return new ArrayList<>();
-        List<Piece> res = new ArrayList<>();
-        Piece piece;
-        for (int i = x + 1; i <= x + Bomb.RADIUS; i++) {
-            if (i <= Board.length - 2 && (piece = board.getAt(i, y)) != null) {
-                if (piece instanceof Stone) break;
-                res.add(piece);
-            }
-        }
-        for (int i = x - 1; i >= x - Bomb.RADIUS; i--) {
-            if (i >= 1 && (piece = board.getAt(i, y)) != null) {
-                if (piece instanceof Stone) break;
-                res.add(piece);
-            }
-        }
-        for (int j = y + 1; j <= y + Bomb.RADIUS; j++) {
-            if (j <= Board.length - 2 && (piece = board.getAt(x, j)) != null) {
-                if (piece instanceof Stone) break;
-                res.add(piece);
-            }
-        }
-        for (int j = y - 1; j >= y - Bomb.RADIUS; j--) {
-            if (j >= 1 && (piece = board.getAt(x, j)) != null) {
-                if (piece instanceof Stone) break;
-                res.add(piece);
-            }
-        }
+        int x = bomb.getCoordinatesX();
+        int y = bomb.getCoordinatesY();
 
-        for (Piece p : board.getPieces()) {
-            if (p.checkPosition(x, y)) res.add(p);
+        res[0] = bomb;
+        res[1] = board.getAt(x, y - 1);
+        res[2] = board.getAt(x + 1, y);
+        res[3] = board.getAt(x, y + 1);
+        res[4] = board.getAt(x - 1, y);
+        res[5] = board.getAt(x, y - 2);
+        res[6] = board.getAt(x + 2, y);
+        res[7] = board.getAt(x, y + 2);
+        res[8] = board.getAt(x - 2, y);
+
+        board.remove(res[0]);
+
+        if (!(res[1] instanceof Stone)) {
+            board.remove(res[1]);
+            if (!(res[5] instanceof Stone)) board.remove(res[5]);
+        }
+        if (!(res[2] instanceof Stone)) {
+            board.remove(res[2]);
+            if (!(res[6] instanceof Stone)) board.remove(res[6]);
+        }
+        if (!(res[3] instanceof Stone)) {
+            board.remove(res[3]);
+            if (!(res[7] instanceof Stone)) board.remove(res[7]);
+        }
+        if (!(res[4] instanceof Stone)) {
+            board.remove(res[4]);
+            if (!(res[8] instanceof Stone)) board.remove(res[8]);
+        }
+        if (board.getBomberman().isInExplosionRangeOf(bomb)) {
+            board.getBomberman().bleed();
         }
 
         return res;

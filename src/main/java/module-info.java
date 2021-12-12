@@ -10,5 +10,5 @@ module com.uet.oop {
     opens com.uet.oop to javafx.fxml;
     exports com.uet.oop;
     opens com.uet.oop.GraphicsControllers to javafx.fxml;
-    exports com.uet.oop.GraphicsControllers to javafx.fxml;
+    exports com.uet.oop.GraphicsControllers;
 }
