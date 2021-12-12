@@ -6,7 +6,6 @@ import com.uet.oop.ProcessingUnits.MusicPlayer;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,7 +16,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -95,25 +93,25 @@ public class GameController {
         leftside.setLayoutY(0);
 
         numOfBombs = new Label(String.valueOf(this.bomberman.getNumOfBombs()));
-        numOfBombs.setFont(Font.font("Snap ITC", 36));
+        numOfBombs.setFont(Font.font("Snap ITC", 40));
         numOfBombs.setLayoutX(115);
         numOfBombs.setLayoutY(305);
         numOfBombs.setTextFill(Color.BLACK);
 
         healthPoint = new Label(String.valueOf(this.bomberman.getHealthPoint()));
-        healthPoint.setFont(Font.font("Snap ITC", 36));
+        healthPoint.setFont(Font.font("Snap ITC", 40));
         healthPoint.setLayoutX(115);
         healthPoint.setLayoutY(245);
         healthPoint.setTextFill(Color.DARKVIOLET);
 
         minutesLabel = new Label();
         minutesLabel.setFont(Font.font("Snap ITC", 36));
-        minutesLabel.setLayoutX(30);
+        minutesLabel.setLayoutX(15);
         minutesLabel.setLayoutY(180);
 
         secondsLabel = new Label();
         secondsLabel.setFont(Font.font("Snap ITC", 36));
-        secondsLabel.setLayoutX(105);
+        secondsLabel.setLayoutX(100);
         secondsLabel.setLayoutY(180);
 
         loadingview = new ImageView(
@@ -125,9 +123,17 @@ public class GameController {
         loadingview.setLayoutX(0);
         loadingview.setLayoutY(0);
 
+        ImageView logo = new ImageView(
+                new Image(new File("src/main/resources/com/uet/oop/Images/Background/bomberman.png").toURI().toString())
+        );
+        logo.setFitWidth(180);
+        logo.setPreserveRatio(true);
+        logo.setLayoutX(0);
+        logo.setLayoutY(40);
+
         Pane root = new Pane();
         root.setPrefSize(720, 540);
-        root.getChildren().addAll(leftside, pane, numOfBombs, healthPoint, loadingview, minutesLabel, secondsLabel);
+        root.getChildren().addAll(leftside, logo, pane, numOfBombs, healthPoint, minutesLabel, secondsLabel, loadingview);
         Scene playingScene;
         playingScene = new Scene(root, 720, 540);
         playingScene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
@@ -205,7 +211,7 @@ public class GameController {
                 for (ImageVision iv : imageVisions) {
                     if (iv.getPiece().equals(piece)) imgvis = iv;
                 }
-                assert imgvis != null;
+                if (imgvis == null) continue;
                 double x = imgvis.getImageView().getLayoutX();
                 double y = imgvis.getImageView().getLayoutY();
                 Image img = null;
@@ -223,7 +229,7 @@ public class GameController {
             }
         }
 
-        if (bomberman.isInExplosionRangeOf((Bomb) deadPieces[0])) {
+        if (bomberman.isInExplosionRangeOf((Bomb) deadPieces[0], game.getBoard())) {
             if (bomberman.getHealthPoint() > 1) {
                 Image img = bombermanImgVision.getStandingImage();
                 bombermanImgVision.getImageView().setImage(((Bomb) deadPieces[0]).getExplorsionImage());
@@ -265,7 +271,7 @@ public class GameController {
         for (ImageVision iv : imageVisions) {
             if (iv.isAlive() && iv.getPiece().equals(bot)) imgvis = iv;
         }
-        assert imgvis != null;
+        if (imgvis == null) return;
         double fx = imgvis.getImageView().getLayoutX();
         double fy = imgvis.getImageView().getLayoutY();
         game.movePiece(bot, direction);
@@ -339,13 +345,21 @@ public class GameController {
         if (System.currentTimeMillis() - lastTime < 1e3) return;
         lastTime = System.currentTimeMillis();
         Platform.runLater(() -> {
-            minutesLabel.setText(String.valueOf(m));
-            secondsLabel.setText(String.valueOf(s));
+            String ms = String.valueOf(m);
+            if (m < 10) ms = "0" + ms;
+            minutesLabel.setText(ms);
+            String ss = String.valueOf(s);
+            if (s < 10) ss = "0" + ss;
+            secondsLabel.setText(ss);
             if (m == 0 && s <= 3) {
                 minutesLabel.setTextFill(Color.RED);
                 secondsLabel.setTextFill(Color.RED);
                 clockSound.play();
                 clockSound.setVolume(soundVolume);
+                if (s == 0) {
+                    clockSound.stop();
+                    defeatSound.play();
+                }
             } else {
                 minutesLabel.setTextFill(Color.LIMEGREEN);
                 secondsLabel.setTextFill(Color.LIMEGREEN);
@@ -354,7 +368,7 @@ public class GameController {
         });
     }
 
-    public void setLoadingDone() {
+    public void loadingDone() {
         loadingview.setVisible(false);
         loadingMusic.stop();
         battleMusic.play();

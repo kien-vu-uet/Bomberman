@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Queue;
 
 public class Bomberman extends Piece {
-    public static final double DURATION = 0.25;//seconds
+    public static final double DURATION = 0.3;//seconds
     public static final double STUNNED_TIME = 3;
     private List<Image> standingImages;
     private List<Image> movingImages;
@@ -122,13 +122,23 @@ public class Bomberman extends Piece {
         return movingImages.get(4);
     }
 
-    public boolean isInExplosionRangeOf(Bomb bomb) {
+    public boolean isInExplosionRangeOf(Bomb bomb, Board board) {
         int x1 = bomb.getCoordinatesX();
         int y1 = bomb.getCoordinatesY();
         int x2 = super.getCoordinatesX();
         int y2 = super.getCoordinatesY();
-        if (x1 == x2 && Math.abs(y1 - y2) <= Bomb.RADIUS) return true;
-        if (y1 == y2 && Math.abs(x1 - x2) <= Bomb.RADIUS) return true;
+        if (x1 == x2 && Math.abs(y1 - y2) <= Bomb.RADIUS) {
+            for (int step = (y1 < y2 ? 1 : -1); y1 != y2; y1 += step) {
+                if (board.getAt(x1, y1) instanceof Stone) return false;
+            }
+            return true;
+        }
+        if (y1 == y2 && Math.abs(x1 - x2) <= Bomb.RADIUS) {
+            for (int step = (x1 < x2 ? 1 : -1); x1 != x2; x1 += step) {
+                if (board.getAt(x1, y1) instanceof Stone) return false;
+            }
+            return true;
+        }
         return false;
     }
 

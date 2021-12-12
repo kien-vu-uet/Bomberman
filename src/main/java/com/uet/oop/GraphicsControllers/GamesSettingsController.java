@@ -31,7 +31,6 @@ public class GamesSettingsController {
 
     @FXML
     private void musicSliderOnDragged() {
-        selectSound.play();
         double value = musicSlider.getValue();
         if (value == 0) {
             musicIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteMusic.png").toURI().toString()));
@@ -61,7 +60,6 @@ public class GamesSettingsController {
 
     @FXML
     private void soundSliderOnDragged() {
-        selectSound.play();
         double value = soundSlider.getValue();
         if (value == 0) {
             soundIcon.setImage(new Image(new File("src//main//resources//com//uet//oop//Images//Background//muteSound.png").toURI().toString()));

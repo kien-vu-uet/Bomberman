@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.Random;
 
 public class Bot extends Piece {
-    public static final double DURATION = 6; //seconds;
+    public static final double DURATION = 5; //seconds;
     private int level;
     private Image moveImage;
     private Image deadImage;
@@ -105,7 +105,8 @@ public class Bot extends Piece {
         }
         Piece piece;
         if ((piece = board.getAt(x, y)) == null) return true;
-        return !(piece instanceof Stone) && !(piece instanceof Brick) && !(piece instanceof Bomb);
+        return !(piece instanceof Stone) && !(piece instanceof Brick)
+                && !(piece instanceof Bomb) && !(piece instanceof Bot);
     }
 
     /**
