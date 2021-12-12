@@ -110,7 +110,8 @@ public class HomeController {
         selectSound.stop();
 
         Game game = new Game();
-        String mp = "map_" + (SELECTED_LEVEL) + ".txt";
+//        String mp = "map_" + (SELECTED_LEVEL) + ".txt";
+        String mp = "map1.txt";
         game.initialize("src/main/resources/com/uet/oop/Maps/" + mp);
         Bomberman bomberman = game.getBoard().getBomberman();
         switch(imageIndex) {
@@ -122,7 +123,6 @@ public class HomeController {
         GameController gc = new GameController();
         GameRunner rg = new GameRunner(gc);
         gc.show(game, bomberman);
-        gc.setLoadingDone();
         rg.start();
     }
 
@@ -164,7 +164,6 @@ public class HomeController {
 
     @FXML
     private void musicSliderOnDragged() {
-        selectSound.play();
         double value = musicSlider.getValue();
         if (value == 0) {
             musicIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/muteMusic.png").toURI().toString()));
@@ -178,7 +177,6 @@ public class HomeController {
 
     @FXML
     private void soundSliderOnDragged() {
-        selectSound.play();
         double value = soundSlider.getValue();
         if (value == 0) {
             soundIcon.setImage(new Image(new File("src/main/resources/com/uet/oop/Images/Background/muteSound.png").toURI().toString()));

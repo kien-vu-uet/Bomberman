@@ -1,5 +1,7 @@
 package com.uet.oop.Entities;
 
+import com.uet.oop.GraphicsControllers.HomeController;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class Board {
                     } else if (s.charAt(i) == '=') {
                         pieces.add(new Brick(i, j));
                     } else if (s.charAt(i) == '!') {
-                        pieces.add(new Bot(i, j, new Random().nextInt(5) + 1));
+                        pieces.add(new Bot(i, j, new Random().nextInt(HomeController.HIGHEST_LEVEL) % 5 + 1));
                     } else if (s.charAt(i) == '$') {
                         pieces.add(new Bomberman(i, j));
                     }
@@ -44,7 +46,7 @@ public class Board {
         }
     }
 
-    public void setPlayingTime(int time) {
+    public void addBonusTime(int time) {
         playingTime += time;
     }
 

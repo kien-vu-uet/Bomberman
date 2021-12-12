@@ -56,19 +56,17 @@ public class Game {
     }
 
     public void pause() {
-        if (!isRunning) return;
         isPaused = true;
         pausedTime = System.currentTimeMillis();
     }
 
     public void resume() {
-        if (!isRunning) return;
         isPaused = false;
         penalty += (System.currentTimeMillis() - pausedTime) / 1e3;
     }
 
     public void bonusTime() {
-        board.setPlayingTime(Bonus.TIME_BONUS);
+        board.addBonusTime(Bonus.TIME_BONUS);
     }
 
     public void initialize(String boardFile) {
@@ -135,7 +133,7 @@ public class Game {
             board.remove(res[4]);
             if (!(res[8] instanceof Stone)) board.remove(res[8]);
         }
-        if (board.getBomberman().isInExplosionRangeOf(bomb)) {
+        if (board.getBomberman().isInExplosionRangeOf(bomb, board)) {
             board.getBomberman().bleed();
         }
 
