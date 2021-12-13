@@ -110,8 +110,8 @@ public class HomeController {
         selectSound.stop();
 
         Game game = new Game();
-//        String mp = "map_" + (SELECTED_LEVEL) + ".txt";
-        String mp = "map1.txt";
+        String mp = "map_" + (SELECTED_LEVEL) + ".txt";
+//        String mp = "map1.txt";
         game.initialize("src/main/resources/com/uet/oop/Maps/" + mp);
         Bomberman bomberman = game.getBoard().getBomberman();
         switch(imageIndex) {
