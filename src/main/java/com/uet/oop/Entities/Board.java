@@ -19,6 +19,7 @@ public class Board {
     }
 
     void readBoard(String path) {
+        Piece.AUTO_INCREMENT_INDEX = 0;
         try {
             File file = new File(path);
             if (!file.exists()) System.err.println("File not found");
@@ -84,6 +85,11 @@ public class Board {
 
     public void remove(Piece piece) {
         if (piece instanceof Bomberman) return;
+        if (piece instanceof Bonus) return;
+        if (piece instanceof Bomb b) {
+            b.explore();
+            pieces.remove(b);
+        }
         if (piece instanceof Bot b1) pieces.add(b1.getContainedBonus());
         else if (piece instanceof Brick b2) pieces.add(b2.getContainedBonus());
         pieces.remove(piece);
@@ -116,7 +122,7 @@ public class Board {
         List<Bot> bots = new ArrayList<>();
         for (int i = 0; i < pieces.size(); i++) {
             Piece piece = pieces.get(i);
-            if (piece instanceof Bot) {
+            if (piece != null && piece instanceof Bot) {
                 bots.add((Bot) piece);
             }
         }
@@ -136,7 +142,7 @@ public class Board {
         List<Bomb> bombs = new ArrayList<>();
         for (int i = 0; i < pieces.size(); i++) {
             Piece piece = pieces.get(i);
-            if (piece instanceof Bomb) {
+            if (piece != null && piece instanceof Bomb) {
                 bombs.add((Bomb) piece);
             }
         }

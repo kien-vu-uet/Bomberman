@@ -150,8 +150,7 @@ public class GameController {
                 case DOWN, S -> moveBomberman(3);
                 case NUMPAD0, SPACE -> bomb();
             }
-            numOfBombs.setText(String.valueOf(this.bomberman.getNumOfBombs()));
-            healthPoint.setText(String.valueOf(this.bomberman.getHealthPoint()));
+            setBombermanResources();
         });
 
         Stage stage = BombermanGame.mainStage;
@@ -161,6 +160,7 @@ public class GameController {
 
     public void bomb() {
         if (bomberman.getNumOfBombs() < 1) return;
+        if (bomberman.isStunned()) return;
         int x = bomberman.getCoordinatesX();
         int y = bomberman.getCoordinatesY();
         Bomb bomb = game.bombAt(x, y);
@@ -177,7 +177,7 @@ public class GameController {
         explosionSound.play();
         for (int i = 0; i < len; i++) {
             Piece piece = deadPieces[i];
-            if (piece == null) {
+            if (piece == null || piece instanceof Bomberman) {
                 int finalI = i;
                 Platform.runLater(() -> {
                     double lx = xx, ly = yy;
@@ -211,30 +211,23 @@ public class GameController {
                 for (ImageVision iv : imageVisions) {
                     if (iv.getPiece().equals(piece)) imgvis = iv;
                 }
+                System.out.print(piece.getCoordinatesX() + " " + piece.getCoordinatesY() + " ");
                 if (imgvis == null) continue;
                 double x = imgvis.getImageView().getLayoutX();
                 double y = imgvis.getImageView().getLayoutY();
                 Image img = null;
+                if (piece instanceof Bonus b) img = b.getStandingImage();
+                imgvis.setOnExplosion();
+                animated(imgvis.getImageView(), x, x, y, y, 0.5, img);
                 Bonus bonus = imgvis.getContainedBonus();
                 if (bonus != null) {
-                    img = bonus.getStandingImage();
-                    Image img2 = imgvis.getExplosionImage();
-                    imgvis.setPiece(bonus, img2);
-                    imgvis.getImageView().setVisible(true);
-                } else {
-                    imgvis.setOnExplosion();
-                    imgvis.stop();
+                    ImageVision bvis = new ImageVision(bonus);
+                    System.out.println(bonus.getCoordinatesX() + " " + bonus.getCoordinatesY());
+                    imageVisions.add(bvis);
+                    Platform.runLater(() -> {
+                        pane.getChildren().add(bvis.getImageView());
+                    });
                 }
-                animated(imgvis.getImageView(), x, x, y, y, 0.5, img);
-            }
-        }
-
-        if (bomberman.isInExplosionRangeOf((Bomb) deadPieces[0], game.getBoard())) {
-            if (bomberman.getHealthPoint() > 1) {
-                Image img = bombermanImgVision.getStandingImage();
-                bombermanImgVision.getImageView().setImage(((Bomb) deadPieces[0]).getExplorsionImage());
-                animated(bombermanImgVision.getImageView(), bombermanImgVision.getLayoutX(), bombermanImgVision.getLayoutX(),
-                        bombermanImgVision.getLayoutY(), bombermanImgVision.getLayoutY(), 0.5, img);
             }
         }
     }
@@ -284,6 +277,7 @@ public class GameController {
     }
 
     private void animated(ImageView imgview, double fx, double tx, double fy, double ty, double interval, Image img) {
+        if (imgview == null) return;
         TranslateTransition animation = new TranslateTransition(
                 Duration.seconds(interval), imgview
         );
@@ -308,26 +302,40 @@ public class GameController {
     }
 
     public void fade() {
-        FadeTransition fade = new FadeTransition(
-                Duration.seconds(Bomberman.STUNNED_TIME / 6), bombermanImgVision.getImageView()
-        );
-        fade.setFromValue(1.0);
-        fade.setToValue(0.3);
-        fade.setAutoReverse(true);
-        fade.setCycleCount(6);
-        fade.play();
+        if (bombermanImgVision.getImageView() == null) return;
+        System.out.println(1);
+        try {
+            FadeTransition fade = new FadeTransition(
+                    Duration.seconds(Bomberman.STUNNED_TIME / 6), bombermanImgVision.getImageView()
+            );
+            fade.setFromValue(1.0);
+            fade.setToValue(0.3);
+            fade.setAutoReverse(true);
+            fade.setCycleCount(6);
+            fade.play();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        System.out.println(2);
     }
 
-    public void claimBonus(Bonus b) {
+    public void claimBonus(Bonus bonus) {
         bonusSound.play();
         System.out.println("claim bonus");
-        game.getBoard().getPieces().remove(b);
         imageVisions.forEach(iv -> {
-            if (iv.isAlive() && iv.getPiece().equals(b)) {
+            if (iv.isAlive() && iv.getPiece().equals(bonus)) {
                 animated(iv.getImageView(), iv.getLayoutX(), iv.getLayoutX(),
                         iv.getLayoutY(), iv.getLayoutY(), 0.1, null);
                 iv.stop();
             }
+        });
+        game.getBoard().getPieces().remove(bonus);
+    }
+
+    public void setBombermanResources() {
+        Platform.runLater(() -> {
+            numOfBombs.setText(String.valueOf(this.bomberman.getNumOfBombs()));
+            healthPoint.setText(String.valueOf(this.bomberman.getHealthPoint()));
         });
     }
 

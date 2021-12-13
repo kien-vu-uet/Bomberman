@@ -15,6 +15,7 @@ public class Game {
 
     public void setStatus(int stt) {
         endingStatus = stt;
+        System.out.println(stt);
         if (stt == 1) isRunning = false;
     }
 
@@ -133,9 +134,9 @@ public class Game {
             board.remove(res[4]);
             if (!(res[8] instanceof Stone)) board.remove(res[8]);
         }
-        if (board.getBomberman().isInExplosionRangeOf(bomb, board)) {
-            board.getBomberman().bleed();
-        }
+//        if (board.getBomberman().isInExplosionRangeOf(bomb, board)) {
+//            board.getBomberman().bleed();
+//        }
 
         return res;
     }

@@ -1,7 +1,7 @@
 package com.uet.oop.Entities;
 
 public abstract class Piece {
-    private static int AUTO_INCREMENT_INDEX = 0;
+    public static int AUTO_INCREMENT_INDEX = 0;
     private int coordinatesX;
     private int coordinatesY;
     private int index;

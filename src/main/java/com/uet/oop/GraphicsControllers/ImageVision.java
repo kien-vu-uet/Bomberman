@@ -69,6 +69,8 @@ public class ImageVision {
             imgview.setImage(p3.getExplosionImage());
         } else if (piece instanceof Bomb p4) {
             imgview.setImage(p4.getExplorsionImage());
+        } else if (piece instanceof Bonus) {
+            imgview.setImage(((Bomb) piece).getExplorsionImage());
         }
     }
 

@@ -9,16 +9,18 @@ import java.util.List;
 import java.util.Queue;
 
 public class Bomberman extends Piece {
-    public static final double DURATION = 0.3;//seconds
-    public static final double STUNNED_TIME = 3;
+    public static final double DURATION = 0.25;//seconds
+    public static final double STUNNED_TIME = 1.5;
+    public static final double COEFFICENT = 1.1;
     private List<Image> standingImages;
     private List<Image> movingImages;
     private String color;
     private int numOfBombs = 1;
-    private int healthPoint = 1;
+    private int healthPoint = 3;
     private long lastTimeMove;
     private Queue<Long> lastTimeBomb = new LinkedList<>();
     private int lastMoveDirection = 3;
+    private long stunStartTime;
 
     public Bomberman(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
@@ -39,7 +41,7 @@ public class Bomberman extends Piece {
     }
 
     public boolean ableToMove() {
-        return (System.nanoTime() - lastTimeMove >= DURATION * 1.05e9);
+        return (System.nanoTime() - lastTimeMove >= DURATION * COEFFICENT * 1e9) && !isStunned();
     }
 
     public boolean isAlive() {
@@ -65,18 +67,12 @@ public class Bomberman extends Piece {
 
     public void bleed() {
         healthPoint--;
-        if (healthPoint <= 0) {
-            System.out.println("dead");
-        } else {
-            lastTimeMove += STUNNED_TIME * 1e9;
-            lastTimeBomb.forEach(l -> {
-                l += (long) (STUNNED_TIME * 1e9);
-            });
-        }
+        if (healthPoint <= 0) System.out.println("dead");
+        else stunStartTime = System.currentTimeMillis();
     }
 
     public boolean isStunned() {
-        return (lastTimeMove > System.nanoTime());
+        return (System.currentTimeMillis() - stunStartTime < STUNNED_TIME * 1e3);
     }
 
     public void heal() {
@@ -84,12 +80,11 @@ public class Bomberman extends Piece {
     }
 
     public void restoreBomb() {
+        if (lastTimeBomb.isEmpty()) return;
         while (!lastTimeBomb.isEmpty()) {
-            if (System.nanoTime() - lastTimeBomb.peek() >= Bomb.EXISTED_TIME * 1e9) {
-                numOfBombs++;
-                lastTimeBomb.remove();
-                System.out.println("restored");
-            } else break;
+            if (System.nanoTime() - lastTimeBomb.peek() < Bomb.EXISTED_TIME * 1e9) break;
+            equipBomb();
+            lastTimeBomb.clear();
         }
     }
 
