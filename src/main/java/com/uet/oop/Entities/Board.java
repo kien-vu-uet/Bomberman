@@ -90,8 +90,16 @@ public class Board {
             b.explore();
             pieces.remove(b);
         }
-        if (piece instanceof Bot b1) pieces.add(b1.getContainedBonus());
-        else if (piece instanceof Brick b2) pieces.add(b2.getContainedBonus());
+        if (piece instanceof Bot b1) {
+            b1.getContainedBonus().setCoordinatesX(b1.getCoordinatesX());
+            b1.getContainedBonus().setCoordinatesY(b1.getCoordinatesY());
+            pieces.add(b1.getContainedBonus());
+        }
+        else if (piece instanceof Brick b2) {
+            b2.getContainedBonus().setCoordinatesX(b2.getCoordinatesX());
+            b2.getContainedBonus().setCoordinatesY(b2.getCoordinatesY());
+            pieces.add(b2.getContainedBonus());
+        }
         pieces.remove(piece);
     }
 
