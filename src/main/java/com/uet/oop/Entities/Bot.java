@@ -3,6 +3,8 @@ package com.uet.oop.Entities;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class Bot extends Piece {
@@ -12,6 +14,7 @@ public class Bot extends Piece {
     private Image deadImage;
     private long lastTimeMove;
     private Bonus containedBonus;
+    private Queue<Integer> sequenceAction = new LinkedList<>();
 
     public Bot(int coordinatesX, int coordinatesY) {
         super(coordinatesX, coordinatesY);
@@ -91,6 +94,19 @@ public class Bot extends Piece {
     public void setLevel(int level) {
         this.level = Math.abs(level) % 5 + 1;
         loadImages();
+    }
+
+    public int getNextAction() {
+        if (sequenceAction.isEmpty()) {
+            return new Random().nextInt(4) % 4;
+        }
+        return sequenceAction.remove();
+    }
+
+    public void setSequenceAction(Queue<Integer> params) {
+        this.sequenceAction = params;
+        System.out.print(this.getIndex() + " : ");
+        System.out.println(sequenceAction);
     }
 
     @Override
