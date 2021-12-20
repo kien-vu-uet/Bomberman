@@ -52,6 +52,7 @@ public class ImageVision {
         } else if (piece instanceof Bonus p6) {
             imgview.setImage(p6.getStandingImage());
         }
+        //
     }
 
     public void setOnMoving() {
