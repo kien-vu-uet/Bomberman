@@ -118,8 +118,10 @@ public class Board {
         StringBuilder res = new StringBuilder();
         res.append("\n");
         String[][] board = new String[SIZE][SIZE];
-        for (Piece piece : pieces) {
+        for (int i = 0; i < pieces.size(); i++) {
+            Piece piece = pieces.get(i);
             if (piece instanceof Bot) continue;
+            if (piece instanceof Bomberman) continue;
             board[piece.getCoordinatesY()][piece.getCoordinatesX()] = piece.getSymbol();
         }
         for (int j = 0; j < SIZE; j++) {
@@ -129,7 +131,7 @@ public class Board {
             }
             res.append("\n");
         }
-        return res.toString();
+        return res.substring(0, res.length() - 1);
     }
 
     public List<Bot> getBots() {

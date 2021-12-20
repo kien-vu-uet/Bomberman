@@ -1,5 +1,6 @@
 package com.uet.oop.ProcessingUnits;
 
+import com.uet.oop.AiUnits.AI;
 import com.uet.oop.Entities.Bomb;
 import com.uet.oop.Entities.Bonus;
 import com.uet.oop.Entities.Bot;
@@ -85,8 +86,10 @@ public class GameRunner implements Runnable {
             Random random = new Random();
             if (!bots.isEmpty()) {
                 bots.forEach(bot -> {
-                    if (random.nextInt(3) == 1) {
-                        int direction = random.nextInt(4) % 4;
+                    if (random.nextInt(4) == 1) {
+                        int direction = //AI.botAction(gc.game.getBoard().toString(), bot.getCoordinatesX(), bot.getCoordinatesY()
+                                //, gc.bomberman.getCoordinatesX(), gc.bomberman.getCoordinatesY());
+                                random.nextInt(4) % 4;
                         gc.moveBot(bot, direction);
                     }
                 });

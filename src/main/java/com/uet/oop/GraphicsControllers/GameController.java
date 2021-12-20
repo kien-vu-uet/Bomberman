@@ -177,7 +177,7 @@ public class GameController {
         explosionSound.play();
         for (int i = 0; i < len; i++) {
             Piece piece = deadPieces[i];
-            if (piece == null || piece instanceof Bomberman) {
+            if (piece == null || piece instanceof Bomberman || piece instanceof Bonus) {
                 int finalI = i;
                 Platform.runLater(() -> {
                     double lx = xx, ly = yy;
