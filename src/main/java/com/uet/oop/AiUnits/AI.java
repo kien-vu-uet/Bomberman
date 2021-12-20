@@ -61,10 +61,14 @@ public class AI {
                     // This part for handling Solid Things.
                 } else if (data.charAt(col) == '*') {
                     // This part for handling bomb impaction.
+		    if (row > 1)    grid[row - 2][col] = 0;
                     if (row > 0)    grid[row - 1][col] = 0;
                     if (row < 17)   grid[row + 1][col] = 0;
+		    if (row < 16)  grid[row + 2][col] = 0;
                     if (col > 0)   grid[row][col - 1] = 0;
+		    if (col > 1)   grid[row][col - 2] = 0;
                     if (col < 17)   grid[row][col + 1] = 0;
+		    if (col < 16) grid[row][col + 2] = 0;
                     grid[row][col] = 0;
                 } else {
                     // This part corresponding the empty cell.
@@ -340,4 +344,3 @@ public class AI {
         return Path;
     }
 }
-
