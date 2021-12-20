@@ -116,7 +116,6 @@ public class Board {
 
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append("\n");
         String[][] board = new String[SIZE][SIZE];
         for (int i = 0; i < pieces.size(); i++) {
             Piece piece = pieces.get(i);

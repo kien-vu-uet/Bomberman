@@ -1,5 +1,6 @@
 package com.uet.oop.GraphicsControllers;
 
+import com.uet.oop.AiUnits.AI;
 import com.uet.oop.BombermanGame;
 import com.uet.oop.Entities.*;
 import com.uet.oop.ProcessingUnits.MusicPlayer;
@@ -246,6 +247,13 @@ public class GameController {
             double ty = bomberman.getCoordinatesY() * SIZE;
             animated(bombermanImgVision.getImageView(), fx, tx, fy, ty,
                     Bomberman.DURATION, bomberman.getStandingImage());
+
+            for (Bot bot : game.getBoard().getBots()) {
+                bot.setSequenceAction(AI.botAction(game.getBoard().toString(), bot.getCoordinatesX()
+                        , bot.getCoordinatesY()
+                        , bomberman.getCoordinatesX(), bomberman.getCoordinatesY()));
+            }
+
         } else {
             bombermanImgVision.setOnStanding();
         }
@@ -259,7 +267,6 @@ public class GameController {
     }
 
     public void moveBot(Bot bot, int direction) {
-        if (!bot.ableToMove()) return;
         if (!bot.canMove(game.getBoard(), direction)) return;
         ImageVision imgvis = null;
         for (ImageVision iv : imageVisions) {

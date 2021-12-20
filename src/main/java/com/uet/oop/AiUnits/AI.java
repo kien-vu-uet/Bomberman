@@ -10,7 +10,7 @@ public class AI {
         return 0;
     }
 
-    public static int botAction(String map, int xBot, int yBot, int xAgent, int yAgent) {
+    public static Queue<Integer> botAction(String map, int xBot, int yBot, int xAgent, int yAgent) {
         /* Description of the Grid-
          * 1--> The cell is un blocked or Policy self defined.
          * 0--> The cell is blocked or Policy self defined.
@@ -23,28 +23,46 @@ public class AI {
         // Destination is the left-most top-most corner
         PairCoordinate dest = new PairCoordinate(xAgent, yAgent);
 
-        Stack<PairCoordinate> res = heuristicSearch(grid, src, dest);
-        while (!res.isEmpty()) {
-            PairCoordinate pk = res.peek();
-            if (pk.getY() == yBot) {
-                if (pk.getX() > xBot) {
-                    return 1;
-                } else if (pk.getX() < yBot) {
-                    return 0;
+        Stack<PairCoordinate> sequence = heuristicSearch(grid, src, dest);
+        for (PairCoordinate p : sequence) {
+            System.out.print("[ " + p.getX() + ", " + p.getY() + "] - ");
+        }
+        System.out.println();
+
+        Queue<Integer> res = new LinkedList<>();
+        int xtemp = xBot, ytemp = yBot;
+        while (!sequence.isEmpty()) {
+            PairCoordinate pk = sequence.pop();
+            if (pk.getY() == ytemp) {
+                if (pk.getX() > xtemp) {
+                    res.add(1);
+                    xtemp = pk.getX();
+                } else if (pk.getX() < xtemp) {
+                    res.add(0);
+                    xtemp = pk.getX();
                 }
             }
-            if (pk.getX() == xBot) {
-                if (pk.getY() > yBot) {
-                    return 3;
-                } else if (pk.getY() < yBot) {
-                    return 2;
+            if (pk.getX() == xtemp) {
+                if (pk.getY() > ytemp) {
+                    res.add(3);
+                    ytemp = pk.getY();
+                } else if (pk.getY() < ytemp) {
+                    res.add(2);
+                    ytemp = pk.getY();
                 }
             }
-            break;
         }
 
-        Random rn = new Random();
-        return rn.nextInt() % 4;
+        if (res.isEmpty()) {
+            Random rn = new Random();
+            res.add(rn.nextInt() % 4);
+            res.add(rn.nextInt() % 4);
+            res.add(rn.nextInt() % 4);
+            res.add(rn.nextInt() % 4);
+        }
+        System.out.println(res);
+
+        return res;
     }
 
 
@@ -83,6 +101,7 @@ public class AI {
 
     public static Stack<PairCoordinate> heuristicSearch(int[][] grid, PairCoordinate src, PairCoordinate dest) {
         Stack<PairCoordinate> Path = new Stack<>();
+        System.out.printf("Bommer : %d - %d%nBot : %d - %d%n", dest.getX(), dest.getY(), src.getX(), src.getY());
         // If the source is out of range
         if (!Cell.isValid(src.getY(), src.getX())) {
             System.out.print("Source is invalid\n");

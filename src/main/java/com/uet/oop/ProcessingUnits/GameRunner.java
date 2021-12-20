@@ -32,6 +32,13 @@ public class GameRunner implements Runnable {
         System.out.println("On playing");
         //
         gc.game.run();
+
+        for (Bot bot : gc.game.getBoard().getBots()) {
+            bot.setSequenceAction(AI.botAction(gc.game.getBoard().toString(), bot.getCoordinatesX()
+                    , bot.getCoordinatesY()
+                    , gc.bomberman.getCoordinatesX(), gc.bomberman.getCoordinatesY()));
+        }
+
         while (gc.bomberman.isAlive() && gc.game.isRunning()) {
             if (gc.game.isPaused()) {
                 System.out.println(1);
@@ -85,14 +92,13 @@ public class GameRunner implements Runnable {
             List<Bot> bots = gc.game.getBoard().getBots();
             Random random = new Random();
             if (!bots.isEmpty()) {
-                bots.forEach(bot -> {
-                    if (random.nextInt(4) == 1) {
-                        int direction = //AI.botAction(gc.game.getBoard().toString(), bot.getCoordinatesX(), bot.getCoordinatesY()
-                                //, gc.bomberman.getCoordinatesX(), gc.bomberman.getCoordinatesY());
-                                random.nextInt(4) % 4;
-                        gc.moveBot(bot, direction);
-                    }
-                });
+                for (Bot bot : bots) {
+                    if (!bot.ableToMove() || random.nextInt(2) == 0) continue;
+                    int direction = bot.getNextAction();
+                    if (direction != -1)
+                        System.out.println(bot.getIndex() + " : " + direction);
+                    gc.moveBot(bot, direction);
+                }
             } else gc.game.setStatus(1);
         }
         // match ending
