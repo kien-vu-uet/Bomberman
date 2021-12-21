@@ -63,7 +63,7 @@ public class Game {
 
     public void resume() {
         isPaused = false;
-        penalty += (System.currentTimeMillis() - pausedTime) / 1e3;
+        penalty += System.currentTimeMillis() - pausedTime;
     }
 
     public void bonusTime() {

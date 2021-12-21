@@ -105,8 +105,8 @@ public class Bot extends Piece {
 
     public void setSequenceAction(Queue<Integer> params) {
         this.sequenceAction = params;
-        System.out.print(this.getIndex() + " : ");
-        System.out.println(sequenceAction);
+//        System.out.print(this.getIndex() + " : ");
+//        System.out.println(sequenceAction);
     }
 
     @Override

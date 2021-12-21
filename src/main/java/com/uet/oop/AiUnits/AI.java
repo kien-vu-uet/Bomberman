@@ -24,10 +24,10 @@ public class AI {
         PairCoordinate dest = new PairCoordinate(xAgent, yAgent);
 
         Stack<PairCoordinate> sequence = heuristicSearch(grid, src, dest);
-        for (PairCoordinate p : sequence) {
-            System.out.print("[ " + p.getX() + ", " + p.getY() + "] - ");
-        }
-        System.out.println();
+//        for (PairCoordinate p : sequence) {
+//            System.out.print("[ " + p.getX() + ", " + p.getY() + "] - ");
+//        }
+//        System.out.println();
 
         Queue<Integer> res = new LinkedList<>();
         int xtemp = xBot, ytemp = yBot;
@@ -60,7 +60,7 @@ public class AI {
             res.add(rn.nextInt() % 4);
             res.add(rn.nextInt() % 4);
         }
-        System.out.println(res);
+//        System.out.println(res);
 
         return res;
     }
