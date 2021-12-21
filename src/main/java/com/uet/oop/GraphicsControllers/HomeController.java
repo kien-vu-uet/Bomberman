@@ -7,6 +7,7 @@ import com.uet.oop.ProcessingUnits.MusicPlayer;
 import com.uet.oop.ProcessingUnits.GameRunner;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -16,9 +17,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
-public class HomeController {
+public class HomeController implements Initializable {
     @FXML private ImageView map;
     @FXML private ImageView bomberman;
     @FXML private Slider musicSlider;
@@ -213,5 +215,11 @@ public class HomeController {
 
     public List<ImageView> getImages() {
         return images;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        soundSliderOnDragged();
+        musicSliderOnDragged();
     }
 }

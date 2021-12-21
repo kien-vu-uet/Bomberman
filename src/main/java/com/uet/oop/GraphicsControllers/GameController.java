@@ -425,6 +425,8 @@ public class GameController {
                 scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
                     System.out.println(keyEvent.getCode());
                     endingMusic.stop();
+                    HomeController.musicVolume = musicVolume;
+                    HomeController.soundVolume = soundVolume;
                     new HomeController().show();
                 });
                 Stage stage = BombermanGame.mainStage;
